@@ -1,0 +1,95 @@
+{
+  "projectType": "saas",
+  "projectName": "Robotics School",
+  "projectDescription": "A Laravel-based learning management system for robotics education with user management, course organization, and group coordination.",
+  "theme": "almond",
+  "primaryColor": "#040404",
+  "lightColor": "#ef370f",
+  "darkColor": "#f79d72",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "configuration"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/user-management",
+              "features/course-management",
+              "features/group-system",
+              "features/role-based-access"
+            ]
+          },
+          {
+            "group": "Database",
+            "pages": [
+              "database/schema",
+              "database/models",
+              "database/migrations",
+              "database/seeders"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development/architecture",
+              "development/controllers",
+              "development/testing"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Controllers",
+            "pages": [
+              "api/curso-controller",
+              "api/usuario-controller"
+            ]
+          },
+          {
+            "group": "Models",
+            "pages": [
+              "api/curso-model",
+              "api/usuario-model",
+              "api/grupo-model"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Role-based user management (Student, Teacher, Administrative)",
+    "Course management with content, cover images, and didactic materials",
+    "Group organization system for skill levels (beginner, intermediate, advanced)",
+    "Many-to-many relationship between courses and groups",
+    "Database seeding with default users for each role",
+    "Robotics kit tracking per course"
+  ],
+  "publicApiSurface": [
+    "CursoController::index()",
+    "CursoController::store(Request $request)",
+    "CursoController::show(string $id)",
+    "CursoController::update(Request $request, string $id)",
+    "CursoController::destroy(string $id)",
+    "UsuarioController::index()",
+    "UsuarioController::store(Request $request)",
+    "UsuarioController::show(string $id)",
+    "UsuarioController::update(Request $request, string $id)",
+    "UsuarioController::destroy(string $id)",
+    "Curso model (titulo, cover, contenido, didactic_material, robotics_kit)",
+    "usuarios model with group relationship",
+    "grupos model with users and courses relationships"
+  ]
+}
