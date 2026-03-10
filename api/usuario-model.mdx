@@ -1,0 +1,69 @@
+---
+title: 'Usuario Model'
+description: 'API reference for the Usuario model'
+---
+
+## Overview
+
+The `usuarios` model represents users in the Robotics School application. It manages user data and their relationship with groups.
+
+## Table Name
+
+```php
+protected $table = 'usuarios';
+```
+
+## Fillable Attributes
+
+No fillable attributes are explicitly defined in this model.
+
+## Model Definition
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class usuarios extends Model
+{
+    protected $table = 'usuarios';
+    
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+}
+```
+
+## Relationships
+
+### group()
+
+Defines a many-to-one relationship with the Group model.
+
+```php
+public function group()
+{
+    return $this->belongsTo(Group::class);
+}
+```
+
+<ResponseField name="group" type="belongsTo">
+  Each user belongs to a single group. This relationship links the user to their associated group.
+  
+  **Type**: `belongsTo`  
+  **Related Model**: `Group`  
+  **Foreign Key**: `group_id` (Laravel convention)
+</ResponseField>
+
+## Usage Example
+
+```php
+// Get a user with their group
+$user = usuarios::with('group')->find(1);
+
+// Access the user's group
+$group = $user->group;
+```

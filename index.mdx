@@ -1,97 +1,96 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Robotics School"
+description: "A Laravel-based learning management system for robotics education with user management, course organization, and group coordination"
 ---
 
-## Setting up
+<div style={{ 
+  background: 'linear-gradient(135deg, #040404 0%, #1a1a1a 100%)', 
+  padding: '60px 40px',
+  borderRadius: '0px',
+  marginBottom: '48px',
+  color: '#ffffff'
+}}>
+  <h1 style={{ fontSize: '48px', fontWeight: '700', marginBottom: '16px', color: '#ffffff' }}>
+    Robotics School Platform
+  </h1>
+  <p style={{ fontSize: '20px', color: '#f79d72', marginBottom: '32px' }}>
+    Manage your robotics education program with role-based access, course management, and group organization.
+  </p>
+  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+    <a href="/installation" style={{ 
+      background: '#ef370f', 
+      color: '#ffffff', 
+      padding: '12px 24px', 
+      borderRadius: '4px',
+      textDecoration: 'none',
+      fontWeight: '600',
+      display: 'inline-block'
+    }}>
+      Get Started
+    </a>
+    <a href="https://github.com/Yurben-bit/Actividad7" style={{ 
+      background: '#ffffff', 
+      color: '#1a1a1a', 
+      padding: '12px 24px', 
+      borderRadius: '4px',
+      textDecoration: 'none',
+      fontWeight: '600',
+      display: 'inline-block'
+    }}>
+      View on GitHub
+    </a>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+## Key Features
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
+Robotics School provides a complete platform for managing robotics education programs.
+
+<CardGroup cols={2}>
+  <Card title="Role-Based Access" icon="user-shield" href="/features/role-based-access">
+    Three user roles: Students, Teachers, and Administrative staff with appropriate permissions
+  </Card>
+  <Card title="Course Management" icon="book" href="/features/course-management">
+    Create and manage courses with content, cover images, didactic materials, and robotics kits
+  </Card>
+  <Card title="Group Organization" icon="users" href="/features/group-system">
+    Organize students into skill-level groups: beginner, intermediate, and advanced
+  </Card>
+  <Card title="Laravel Framework" icon="code" href="/development/architecture">
+    Built on Laravel 12 with modern PHP architecture and best practices
+  </Card>
+</CardGroup>
+
+## Quick Start
+
+Get your Robotics School instance up and running in minutes.
+
+<Steps>
+  <Step title="Install Dependencies">
+    Clone the repository and install PHP and JavaScript dependencies using Composer and npm.
+  </Step>
+  <Step title="Configure Environment">
+    Set up your database connection and application settings in the `.env` file.
+  </Step>
+  <Step title="Run Migrations">
+    Create the database schema and seed with default users for testing.
+  </Step>
+</Steps>
+
+<Card title="Installation Guide" icon="rocket" href="/installation" horizontal>
+  Follow the complete installation guide to set up your development environment
 </Card>
 
-## Make it yours
+## Platform Overview
 
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={3}>
+  <Card title="User Management" icon="user-gear" href="/features/user-management">
+    Manage students, teachers, and administrators
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Database Schema" icon="database" href="/database/schema">
+    Understand the data model and relationships
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="API Reference" icon="terminal" href="/api/curso-controller">
+    Explore controllers and models
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+</CardGroup>

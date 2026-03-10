@@ -1,0 +1,168 @@
+---
+title: 'UsuarioController'
+description: 'Controller for managing user (Usuario) resources'
+---
+
+## Overview
+
+The `UsuarioController` handles all CRUD operations for user resources in the Robotics School application. This controller follows Laravel's resource controller pattern.
+
+**Namespace:** `App\Http\Controllers`
+
+**Extends:** `Controller`
+
+---
+
+## Methods
+
+### index()
+
+Display a listing of user resources.
+
+```php
+public function index()
+```
+
+**Purpose:** Retrieve and display all users in the system.
+
+**Parameters:** None
+
+**Returns:** View or JSON response with list of users
+
+**HTTP Method:** GET
+
+**Route:** `/usuarios`
+
+---
+
+### create()
+
+Show the form for creating a new user resource.
+
+```php
+public function create()
+```
+
+**Purpose:** Display the form for creating a new user.
+
+**Parameters:** None
+
+**Returns:** View with user creation form
+
+**HTTP Method:** GET
+
+**Route:** `/usuarios/create`
+
+---
+
+### store()
+
+Store a newly created user resource in storage.
+
+```php
+public function store(Request $request)
+```
+
+**Purpose:** Validate and save a new user to the database.
+
+<ParamField path="request" type="Request" required>
+  The HTTP request object containing user data from the creation form.
+</ParamField>
+
+**Returns:** Redirect to user list or show page, or JSON response with created user
+
+**HTTP Method:** POST
+
+**Route:** `/usuarios`
+
+---
+
+### show()
+
+Display the specified user resource.
+
+```php
+public function show(string $id)
+```
+
+**Purpose:** Retrieve and display a specific user by ID.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the user to display.
+</ParamField>
+
+**Returns:** View or JSON response with user details
+
+**HTTP Method:** GET
+
+**Route:** `/usuarios/{id}`
+
+---
+
+### edit()
+
+Show the form for editing the specified user resource.
+
+```php
+public function edit(string $id)
+```
+
+**Purpose:** Display the form for editing an existing user.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the user to edit.
+</ParamField>
+
+**Returns:** View with user edit form populated with existing data
+
+**HTTP Method:** GET
+
+**Route:** `/usuarios/{id}/edit`
+
+---
+
+### update()
+
+Update the specified user resource in storage.
+
+```php
+public function update(Request $request, string $id)
+```
+
+**Purpose:** Validate and update an existing user in the database.
+
+<ParamField path="request" type="Request" required>
+  The HTTP request object containing updated user data from the edit form.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the user to update.
+</ParamField>
+
+**Returns:** Redirect to user list or show page, or JSON response with updated user
+
+**HTTP Method:** PUT/PATCH
+
+**Route:** `/usuarios/{id}`
+
+---
+
+### destroy()
+
+Remove the specified user resource from storage.
+
+```php
+public function destroy(string $id)
+```
+
+**Purpose:** Delete a user from the database.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the user to delete.
+</ParamField>
+
+**Returns:** Redirect to user list or JSON response confirming deletion
+
+**HTTP Method:** DELETE
+
+**Route:** `/usuarios/{id}`

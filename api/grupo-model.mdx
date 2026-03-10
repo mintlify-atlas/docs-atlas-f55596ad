@@ -1,0 +1,101 @@
+---
+title: 'Grupo Model'
+description: 'API reference for the Grupo model'
+---
+
+## Overview
+
+The `grupos` model represents groups in the Robotics School application. It manages group data and relationships with users and courses.
+
+## Table Name
+
+```php
+protected $table = 'grupos';
+```
+
+## Fillable Attributes
+
+No fillable attributes are explicitly defined in this model.
+
+## Model Definition
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class grupos extends Model
+{
+    public function users() {
+        return $this->hasMany(User::class);
+    }
+    
+    public function courses() {
+        return $this->belongsToMany(Course::class, 'course_group');
+    }
+}
+```
+
+## Relationships
+
+### users()
+
+Defines a one-to-many relationship with the User model.
+
+```php
+public function users() {
+    return $this->hasMany(User::class);
+}
+```
+
+<ResponseField name="users" type="hasMany">
+  A group can have multiple users. This relationship retrieves all users belonging to the group.
+  
+  **Type**: `hasMany`  
+  **Related Model**: `User`  
+  **Foreign Key**: `group_id` (Laravel convention)
+</ResponseField>
+
+### courses()
+
+Defines a many-to-many relationship with the Course model.
+
+```php
+public function courses() {
+    return $this->belongsToMany(Course::class, 'course_group');
+}
+```
+
+<ResponseField name="courses" type="belongsToMany">
+  A group can be associated with multiple courses, and each course can be associated with multiple groups.
+  
+  **Type**: `belongsToMany`  
+  **Related Model**: `Course`  
+  **Pivot Table**: `course_group`  
+  **Foreign Key**: `grupo_id` (Laravel convention)  
+  **Related Key**: `course_id` (Laravel convention)
+</ResponseField>
+
+## Usage Examples
+
+```php
+// Get a group with all its users
+$group = grupos::with('users')->find(1);
+
+// Get a group with all its courses
+$group = grupos::with('courses')->find(1);
+
+// Get all users in a group
+$users = $group->users;
+
+// Get all courses for a group
+$courses = $group->courses;
+
+// Attach a course to a group
+$group->courses()->attach($courseId);
+
+// Detach a course from a group
+$group->courses()->detach($courseId);
+```

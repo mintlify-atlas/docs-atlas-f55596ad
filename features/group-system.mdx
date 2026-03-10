@@ -1,0 +1,220 @@
+---
+title: 'Group System'
+description: 'Organize students into groups and assign courses for structured learning experiences'
+icon: 'users-rectangle'
+---
+
+## Overview
+
+The Group System provides a flexible way to organize students into cohorts and assign relevant courses to each group. This enables structured learning paths, class management, and differentiated instruction based on skill levels.
+
+## What is a Group?
+
+A group (grupo) is a collection of students who share access to a common set of courses. Groups can represent:
+
+- **Skill Levels**: Beginner, Intermediate, Advanced
+- **Class Sections**: Morning class, Afternoon class, Evening class
+- **Age Groups**: Elementary, Middle School, High School
+- **Learning Tracks**: Arduino track, LEGO Robotics track, Advanced Programming
+- **Academic Terms**: Spring 2024, Fall 2024, Summer Workshop
+
+<CardGroup cols={2}>
+  <Card title="Student Organization" icon="users">
+    Group students by skill level, class section, or learning track for better course delivery.
+  </Card>
+  
+  <Card title="Course Assignment" icon="book">
+    Assign multiple courses to a group, giving all members instant access to the curriculum.
+  </Card>
+</CardGroup>
+
+## Database Schema
+
+The group system is built on the `grupos` table:
+
+```sql
+Schema::create('grupos', function (Blueprint $table) {
+    $table->id();
+    $table->string('nombre'); // beginner, intermediate, advanced
+    $table->timestamps();
+});
+```
+
+<Note>
+  The schema comment suggests skill-level groups (beginner, intermediate, advanced), but the system is flexible enough to support any naming convention that fits your school's needs.
+</Note>
+
+## Group Relationships
+
+### Users in Groups
+
+Groups have a **one-to-many** relationship with users:
+
+- A group can contain multiple students
+- Each student can belong to only one group at a time
+- Group assignment is optional (students can exist without a group)
+
+```php
+public function users() {
+    return $this->hasMany(User::class);
+}
+```
+
+### Courses in Groups
+
+Groups have a **many-to-many** relationship with courses:
+
+- A group can be assigned multiple courses
+- A course can be assigned to multiple groups
+- The relationship is managed through a `course_group` pivot table
+
+```php
+public function courses() {
+    return $this->belongsToMany(Course::class, 'course_group');
+}
+```
+
+<Accordion title="Understanding Many-to-Many Relationships">
+  The many-to-many relationship allows flexible course distribution. For example:
+  
+  - The "Introduction to Arduino" course can be assigned to both "Beginner" and "Intermediate" groups
+  - A "High School Robotics" group can have access to 10 different courses
+  - Teachers can adjust course assignments without affecting user memberships
+  
+  This flexibility enables dynamic curriculum management based on student needs and program structure.
+</Accordion>
+
+## How Groups Work
+
+### Student Perspective
+
+When a student is assigned to a group:
+
+1. They automatically gain access to all courses assigned to that group
+2. Their dashboard displays all available courses from their group
+3. Course access updates automatically when teachers modify group assignments
+4. Moving to a different group changes their available courses
+
+### Teacher Perspective
+
+Teachers and administrators can:
+
+1. **Create Groups**: Establish new groups with descriptive names
+2. **Assign Students**: Add students to appropriate groups
+3. **Assign Courses**: Connect courses to groups for curriculum delivery
+4. **Manage Relationships**: Move students between groups or adjust course assignments
+5. **Track Progress**: Monitor learning outcomes by group
+
+## Creating and Managing Groups
+
+<Steps>
+  <Step title="Create a Group">
+    Define a new group with a meaningful name (e.g., "Beginner Robotics Spring 2024")
+  </Step>
+  
+  <Step title="Add Students">
+    Assign students to the group from the user management interface
+  </Step>
+  
+  <Step title="Assign Courses">
+    Select which courses should be available to this group
+  </Step>
+  
+  <Step title="Monitor and Adjust">
+    Track student progress and adjust course assignments as needed
+  </Step>
+</Steps>
+
+## Use Cases
+
+### Skill-Based Learning Paths
+
+<Card title="Progressive Learning" icon="chart-line">
+  Create three groups: Beginner, Intermediate, and Advanced. Assign foundational courses to beginners, practical projects to intermediate students, and complex challenges to advanced learners.
+</Card>
+
+### Class Section Management
+
+<Card title="Schedule Organization" icon="calendar">
+  Organize students by class time (Morning, Afternoon, Evening) to manage different schedules and course delivery times.
+</Card>
+
+### Specialized Learning Tracks
+
+<Card title="Platform-Specific Paths" icon="microchip">
+  Create groups for different robotics platforms (Arduino Track, LEGO Track, Raspberry Pi Track) and assign platform-specific courses to each.
+</Card>
+
+## Group Operations
+
+### Adding Students to Groups
+
+When adding a student to a group:
+
+- The student's `grupos_id` field is updated to reference the new group
+- Access to the group's courses is granted immediately
+- Previous group membership (if any) is replaced
+
+<Note>
+  Students can only belong to one group at a time. Moving a student to a new group automatically removes them from their previous group.
+</Note>
+
+### Assigning Courses to Groups
+
+To assign a course to a group:
+
+1. Navigate to the group management interface
+2. Select the group to configure
+3. Choose courses from the available course library
+4. Save the assignments
+
+All students in the group immediately gain access to newly assigned courses.
+
+### Removing Students from Groups
+
+Students can be removed from groups, making their `grupos_id` field null. This:
+
+- Removes access to all group-assigned courses
+- Keeps the user account active
+- Allows reassignment to a different group later
+
+### Deleting Groups
+
+<Warning>
+  When a group is deleted, all associated user records are automatically updated (cascade delete). Students who were members of the deleted group will have their group assignment removed (set to null).
+</Warning>
+
+Deleting a group:
+
+- Removes all course assignments for that group
+- Clears group membership for all students (sets `grupos_id` to null)
+- Does not delete student accounts
+- Does not delete courses
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use Descriptive Names">
+    Name groups clearly to indicate their purpose: "Beginner - Spring 2024" instead of just "Group 1"
+  </Accordion>
+  
+  <Accordion title="Review Course Assignments Regularly">
+    Periodically audit which courses are assigned to each group to ensure students have appropriate content
+  </Accordion>
+  
+  <Accordion title="Plan for Growth">
+    Structure groups to accommodate new students joining throughout the term
+  </Accordion>
+  
+  <Accordion title="Document Group Purposes">
+    Maintain documentation about what each group represents and its intended curriculum path
+  </Accordion>
+</AccordionGroup>
+
+## Integration with Other Features
+
+The group system integrates seamlessly with:
+
+- **[User Management](/features/user-management)**: Students are assigned to groups through their user profile
+- **[Course Management](/features/course-management)**: Courses are distributed to students via group assignments
+- **[Role-Based Access](/features/role-based-access)**: Teachers and administrators manage groups based on their role permissions

@@ -1,0 +1,414 @@
+---
+title: Installation
+description: Step-by-step guide to install and set up Robotics School on your server
+---
+
+# Installing Robotics School
+
+This guide will walk you through installing Robotics School on your server or local development environment. The platform uses Laravel 12 and includes automated setup scripts for quick deployment.
+
+## System Requirements
+
+Before installing Robotics School, ensure your system meets these requirements:
+
+<Note>
+  **Minimum Requirements:**
+  - PHP 8.2 or higher
+  - Composer 2.x
+  - Node.js 18.x or higher
+  - NPM 9.x or higher
+  - SQLite 3.x (default) or MySQL 5.7+ / PostgreSQL 10+
+  - 512MB RAM minimum (1GB recommended)
+</Note>
+
+### PHP Extensions Required
+
+Ensure the following PHP extensions are installed and enabled:
+
+```bash
+- php-xml
+- php-mbstring
+- php-sqlite3 (or php-mysql/php-pgsql)
+- php-curl
+- php-zip
+- php-bcmath
+- php-intl
+```
+
+## Installation Methods
+
+Robotics School provides two installation methods: automated setup (recommended) and manual installation.
+
+<Tabs>
+  <Tab title="Automated Setup">
+    ### Quick Installation
+
+    The automated setup script handles all installation steps in one command:
+
+    <Steps>
+      <Step title="Clone the Repository">
+        First, clone the Robotics School repository to your desired location:
+
+        ```bash
+        git clone <repository-url> robotics-school
+        cd robotics-school
+        ```
+      </Step>
+
+      <Step title="Run Setup Script">
+        Execute the automated setup script using Composer:
+
+        ```bash
+        composer run setup
+        ```
+
+        This single command performs the following operations:
+
+        1. Installs all PHP dependencies via `composer install`
+        2. Creates `.env` file from `.env.example` if it doesn't exist
+        3. Generates application encryption key with `php artisan key:generate`
+        4. Runs database migrations with `php artisan migrate --force`
+        5. Installs Node.js dependencies via `npm install`
+        6. Builds frontend assets with `npm run build`
+      </Step>
+
+      <Step title="Create Database File">
+        If using SQLite (default), ensure the database file exists:
+
+        ```bash
+        touch database/database.sqlite
+        ```
+
+        <Note>
+          This step is usually handled automatically, but verify the file exists if you encounter database connection errors.
+        </Note>
+      </Step>
+
+      <Step title="Verify Installation">
+        Check that the installation completed successfully:
+
+        ```bash
+        php artisan --version
+        ```
+
+        You should see Laravel version 12.x displayed.
+      </Step>
+    </Steps>
+
+    <Warning>
+      The setup script runs migrations with the `--force` flag, which executes migrations without confirmation. Ensure your database configuration is correct before running setup.
+    </Warning>
+  </Tab>
+
+  <Tab title="Manual Installation">
+    ### Step-by-Step Manual Installation
+
+    For more control over the installation process, follow these manual steps:
+
+    <Steps>
+      <Step title="Clone and Navigate">
+        Clone the repository and enter the directory:
+
+        ```bash
+        git clone <repository-url> robotics-school
+        cd robotics-school
+        ```
+      </Step>
+
+      <Step title="Install PHP Dependencies">
+        Install all Composer dependencies:
+
+        ```bash
+        composer install
+        ```
+      </Step>
+
+      <Step title="Configure Environment">
+        Copy the example environment file and generate an application key:
+
+        ```bash
+        cp .env.example .env
+        php artisan key:generate
+        ```
+      </Step>
+
+      <Step title="Configure Database">
+        Edit `.env` to configure your database connection. For SQLite (default):
+
+        ```bash
+        touch database/database.sqlite
+        ```
+
+        The `.env` file should have:
+
+        ```env
+        DB_CONNECTION=sqlite
+        ```
+
+        For MySQL or PostgreSQL, update accordingly:
+
+        ```env
+        DB_CONNECTION=mysql
+        DB_HOST=127.0.0.1
+        DB_PORT=3306
+        DB_DATABASE=robotics_school
+        DB_USERNAME=your_username
+        DB_PASSWORD=your_password
+        ```
+      </Step>
+
+      <Step title="Run Migrations">
+        Create all database tables:
+
+        ```bash
+        php artisan migrate
+        ```
+
+        This creates the following tables:
+        - `grupos` (student groups)
+        - `usuarios` (users)
+        - `cursos` (courses)
+        - `course_groups` (course-group relationships)
+        - System tables (cache, jobs, sessions)
+      </Step>
+
+      <Step title="Install Frontend Dependencies">
+        Install Node.js packages:
+
+        ```bash
+        npm install
+        ```
+      </Step>
+
+      <Step title="Build Assets">
+        Compile frontend assets for production:
+
+        ```bash
+        npm run build
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+## Post-Installation Steps
+
+After completing the installation, perform these additional configurations:
+
+### 1. Set File Permissions
+
+Ensure Laravel can write to storage and cache directories:
+
+```bash
+chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+```
+
+<Note>
+  Replace `www-data` with your web server user if different (e.g., `nginx`, `apache`, etc.)
+</Note>
+
+### 2. Configure Application URL
+
+Update your `.env` file with the correct application URL:
+
+```env
+APP_URL=https://your-domain.com
+```
+
+### 3. Set Up Queue Worker (Optional)
+
+Robotics School uses database queues for background processing. To start the queue worker:
+
+```bash
+php artisan queue:listen --tries=1 --timeout=0
+```
+
+For production, consider using a process manager like Supervisor to keep the queue worker running.
+
+### 4. Configure Email (Optional)
+
+If you plan to send emails, configure the mail settings in `.env`:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_FROM_ADDRESS="hello@robotics-school.com"
+MAIL_FROM_NAME="Robotics School"
+```
+
+## Development Environment Setup
+
+For local development, Robotics School includes a convenient development script:
+
+```bash
+composer run dev
+```
+
+This command starts four concurrent processes:
+
+<CodeGroup>
+```bash Server
+php artisan serve
+# Development server at http://localhost:8000
+```
+
+```bash Queue Worker
+php artisan queue:listen --tries=1 --timeout=0
+# Processes background jobs
+```
+
+```bash Log Monitor
+php artisan pail --timeout=0
+# Real-time log viewing
+```
+
+```bash Vite Dev Server
+npm run dev
+# Hot module replacement for frontend assets
+```
+</CodeGroup>
+
+<Warning>
+  The `composer run dev` command disables process timeouts and is designed for development only. Never use this in production.
+</Warning>
+
+## Using Laravel Sail (Docker)
+
+For a containerized development environment, Robotics School supports Laravel Sail:
+
+### First-Time Setup
+
+```bash
+# Install dependencies using Docker
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php82-composer:latest \
+    composer install
+
+# Start Sail
+./vendor/bin/sail up -d
+
+# Run migrations
+./vendor/bin/sail artisan migrate
+```
+
+### Using Sail Alias
+
+Add an alias to your shell profile for convenience:
+
+```bash
+alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'
+```
+
+Then use shorter commands:
+
+```bash
+sail up -d
+sail artisan migrate
+sail npm install
+sail npm run dev
+```
+
+## Testing the Installation
+
+Verify your installation is working correctly:
+
+### 1. Run the Development Server
+
+```bash
+php artisan serve
+```
+
+Visit `http://localhost:8000` in your browser.
+
+### 2. Run the Test Suite
+
+```bash
+composer run test
+```
+
+Or manually:
+
+```bash
+php artisan config:clear
+php artisan test
+```
+
+### 3. Check Database Connection
+
+```bash
+php artisan db:show
+```
+
+This displays your database connection details and confirms connectivity.
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+  <Accordion title="Application key not set">
+    If you see "No application encryption key has been specified", run:
+
+    ```bash
+    php artisan key:generate
+    ```
+  </Accordion>
+
+  <Accordion title="Database connection failed">
+    For SQLite, ensure the database file exists:
+
+    ```bash
+    touch database/database.sqlite
+    ```
+
+    For MySQL/PostgreSQL, verify your credentials in `.env` and ensure the database exists.
+  </Accordion>
+
+  <Accordion title="Permission denied errors">
+    Laravel needs write access to storage and cache:
+
+    ```bash
+    chmod -R 775 storage bootstrap/cache
+    sudo chown -R $USER:www-data storage bootstrap/cache
+    ```
+  </Accordion>
+
+  <Accordion title="npm install fails">
+    Clear npm cache and try again:
+
+    ```bash
+    npm cache clean --force
+    rm -rf node_modules package-lock.json
+    npm install
+    ```
+  </Accordion>
+
+  <Accordion title="Composer memory limit">
+    If Composer runs out of memory:
+
+    ```bash
+    COMPOSER_MEMORY_LIMIT=-1 composer install
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+Now that Robotics School is installed, proceed to configuration:
+
+<Card title="Configuration" icon="gear" href="/configuration">
+  Learn how to configure environment variables, database settings, and application options
+</Card>
+
+---
+
+<Note>
+  For production deployment, consider using Laravel Forge, Vapor, or configuring your own server with Nginx/Apache and PHP-FPM. Always use HTTPS in production and keep your `.env` file secure.
+</Note>

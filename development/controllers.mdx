@@ -1,0 +1,479 @@
+---
+title: Controllers
+description: Understanding controller architecture and resource controllers in the Laravel application
+---
+
+## Overview
+
+Controllers are responsible for handling HTTP requests and coordinating the application's response. The Robotics School application uses Laravel's resource controller pattern to organize CRUD operations.
+
+## Resource Controllers
+
+Resource controllers provide a standardized structure for handling common CRUD operations. Each resource controller includes seven standard methods:
+
+<CardGroup cols={2}>
+  <Card title="index()" icon="list">
+    Display a listing of resources
+  </Card>
+  
+  <Card title="create()" icon="plus">
+    Show form for creating a new resource
+  </Card>
+  
+  <Card title="store()" icon="floppy-disk">
+    Store a newly created resource
+  </Card>
+  
+  <Card title="show()" icon="eye">
+    Display a specific resource
+  </Card>
+  
+  <Card title="edit()" icon="pen-to-square">
+    Show form for editing a resource
+  </Card>
+  
+  <Card title="update()" icon="arrows-rotate">
+    Update a specific resource
+  </Card>
+  
+  <Card title="destroy()" icon="trash">
+    Remove a specific resource
+  </Card>
+</CardGroup>
+
+## Controller Structure
+
+All controllers extend the base `Controller` class and are located in `app/Http/Controllers/`.
+
+### CursoController
+
+Manages course-related operations:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class CursoController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+```
+
+### UsuarioController
+
+Manages user-related operations with the same resource controller structure:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class UsuarioController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+```
+
+## Implementing Controller Methods
+
+Here's how to implement common controller patterns:
+
+<Steps>
+  <Step title="List All Resources">
+    The `index()` method retrieves and displays all resources:
+
+    ```php
+    public function index()
+    {
+        $cursos = Curso::all();
+        return view('cursos.index', compact('cursos'));
+    }
+    ```
+  </Step>
+
+  <Step title="Show Creation Form">
+    The `create()` method displays the form:
+
+    ```php
+    public function create()
+    {
+        return view('cursos.create');
+    }
+    ```
+  </Step>
+
+  <Step title="Store New Resource">
+    The `store()` method validates and saves data:
+
+    ```php
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'duracion' => 'required|integer|min:1',
+        ]);
+
+        $curso = Curso::create($validated);
+
+        return redirect()->route('cursos.show', $curso)
+            ->with('success', 'Curso creado exitosamente.');
+    }
+    ```
+  </Step>
+
+  <Step title="Display Single Resource">
+    The `show()` method displays a specific resource:
+
+    ```php
+    public function show(string $id)
+    {
+        $curso = Curso::findOrFail($id);
+        return view('cursos.show', compact('curso'));
+    }
+    ```
+  </Step>
+
+  <Step title="Show Edit Form">
+    The `edit()` method displays the edit form:
+
+    ```php
+    public function edit(string $id)
+    {
+        $curso = Curso::findOrFail($id);
+        return view('cursos.edit', compact('curso'));
+    }
+    ```
+  </Step>
+
+  <Step title="Update Resource">
+    The `update()` method validates and updates data:
+
+    ```php
+    public function update(Request $request, string $id)
+    {
+        $curso = Curso::findOrFail($id);
+        
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'duracion' => 'required|integer|min:1',
+        ]);
+
+        $curso->update($validated);
+
+        return redirect()->route('cursos.show', $curso)
+            ->with('success', 'Curso actualizado exitosamente.');
+    }
+    ```
+  </Step>
+
+  <Step title="Delete Resource">
+    The `destroy()` method removes the resource:
+
+    ```php
+    public function destroy(string $id)
+    {
+        $curso = Curso::findOrFail($id);
+        $curso->delete();
+
+        return redirect()->route('cursos.index')
+            ->with('success', 'Curso eliminado exitosamente.');
+    }
+    ```
+  </Step>
+</Steps>
+
+## Routing Resource Controllers
+
+Register resource routes in `routes/web.php`:
+
+<CodeGroup>
+```php Single Resource
+Route::resource('cursos', CursoController::class);
+```
+
+```php Multiple Resources
+Route::resource('cursos', CursoController::class);
+Route::resource('usuarios', UsuarioController::class);
+```
+
+```php Partial Resources
+// Only certain methods
+Route::resource('cursos', CursoController::class)
+    ->only(['index', 'show']);
+
+// Exclude certain methods
+Route::resource('usuarios', UsuarioController::class)
+    ->except(['destroy']);
+```
+</CodeGroup>
+
+This single line generates all seven RESTful routes:
+
+| HTTP Method | URI | Action | Route Name |
+|------------|-----|--------|------------|
+| GET | /cursos | index | cursos.index |
+| GET | /cursos/create | create | cursos.create |
+| POST | /cursos | store | cursos.store |
+| GET | /cursos/{id} | show | cursos.show |
+| GET | /cursos/{id}/edit | edit | cursos.edit |
+| PUT/PATCH | /cursos/{id} | update | cursos.update |
+| DELETE | /cursos/{id} | destroy | cursos.destroy |
+
+## Request Validation
+
+Validate incoming requests directly in controllers:
+
+<CodeGroup>
+```php Inline Validation
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:255',
+        'email' => 'required|email|unique:usuarios',
+        'edad' => 'required|integer|min:8|max:18',
+    ]);
+    
+    // Process validated data...
+}
+```
+
+```php Custom Messages
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:255',
+        'email' => 'required|email|unique:usuarios',
+    ], [
+        'nombre.required' => 'El nombre es obligatorio.',
+        'email.unique' => 'Este correo ya está registrado.',
+    ]);
+    
+    // Process validated data...
+}
+```
+
+```php Form Request Class
+// Create: php artisan make:request StoreCursoRequest
+
+public function store(StoreCursoRequest $request)
+{
+    // Data is automatically validated
+    $validated = $request->validated();
+    
+    // Process validated data...
+}
+```
+</CodeGroup>
+
+## Dependency Injection
+
+Inject dependencies into controller methods:
+
+```php
+use App\Models\Curso;
+use App\Services\CursoService;
+use Illuminate\Http\Request;
+
+public function store(Request $request, CursoService $service)
+{
+    $validated = $request->validate([
+        'nombre' => 'required|string|max:255',
+    ]);
+    
+    $curso = $service->createCurso($validated);
+    
+    return redirect()->route('cursos.show', $curso);
+}
+```
+
+## Response Types
+
+Controllers can return various response types:
+
+<CodeGroup>
+```php View Response
+public function show(string $id)
+{
+    $curso = Curso::findOrFail($id);
+    return view('cursos.show', compact('curso'));
+}
+```
+
+```php JSON Response
+public function show(string $id)
+{
+    $curso = Curso::findOrFail($id);
+    return response()->json($curso);
+}
+```
+
+```php Redirect Response
+public function store(Request $request)
+{
+    $curso = Curso::create($request->validated());
+    
+    return redirect()
+        ->route('cursos.show', $curso)
+        ->with('success', 'Curso creado exitosamente.');
+}
+```
+
+```php Download Response
+public function download(string $id)
+{
+    $curso = Curso::findOrFail($id);
+    $pdf = $curso->generatePDF();
+    
+    return response()->download($pdf, 'curso.pdf');
+}
+```
+</CodeGroup>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Keep Controllers Thin" icon="weight-scale">
+    Move complex logic to service classes or model methods
+  </Card>
+  
+  <Card title="Use Form Requests" icon="file-circle-check">
+    Extract validation logic into dedicated form request classes
+  </Card>
+  
+  <Card title="Consistent Naming" icon="font">
+    Follow Laravel naming conventions for methods and routes
+  </Card>
+  
+  <Card title="Return Early" icon="arrow-turn-up">
+    Handle edge cases and validation at the start of methods
+  </Card>
+</CardGroup>
+
+## Creating New Controllers
+
+Generate controllers using Artisan:
+
+<CodeGroup>
+```bash Resource Controller
+php artisan make:controller MatriculaController --resource
+```
+
+```bash API Resource Controller
+php artisan make:controller Api/MatriculaController --api
+```
+
+```bash Controller with Model
+php artisan make:controller MatriculaController --resource --model=Matricula
+```
+</CodeGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="sitemap" href="/development/architecture">
+    Learn about the overall application architecture
+  </Card>
+  
+  <Card title="Testing" icon="flask" href="/development/testing">
+    Test your controller methods
+  </Card>
+</CardGroup>

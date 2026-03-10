@@ -1,0 +1,168 @@
+---
+title: 'CursoController'
+description: 'Controller for managing course (Curso) resources'
+---
+
+## Overview
+
+The `CursoController` handles all CRUD operations for course resources in the Robotics School application. This controller follows Laravel's resource controller pattern.
+
+**Namespace:** `App\Http\Controllers`
+
+**Extends:** `Controller`
+
+---
+
+## Methods
+
+### index()
+
+Display a listing of course resources.
+
+```php
+public function index()
+```
+
+**Purpose:** Retrieve and display all courses in the system.
+
+**Parameters:** None
+
+**Returns:** View or JSON response with list of courses
+
+**HTTP Method:** GET
+
+**Route:** `/cursos`
+
+---
+
+### create()
+
+Show the form for creating a new course resource.
+
+```php
+public function create()
+```
+
+**Purpose:** Display the form for creating a new course.
+
+**Parameters:** None
+
+**Returns:** View with course creation form
+
+**HTTP Method:** GET
+
+**Route:** `/cursos/create`
+
+---
+
+### store()
+
+Store a newly created course resource in storage.
+
+```php
+public function store(Request $request)
+```
+
+**Purpose:** Validate and save a new course to the database.
+
+<ParamField path="request" type="Request" required>
+  The HTTP request object containing course data from the creation form.
+</ParamField>
+
+**Returns:** Redirect to course list or show page, or JSON response with created course
+
+**HTTP Method:** POST
+
+**Route:** `/cursos`
+
+---
+
+### show()
+
+Display the specified course resource.
+
+```php
+public function show(string $id)
+```
+
+**Purpose:** Retrieve and display a specific course by ID.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the course to display.
+</ParamField>
+
+**Returns:** View or JSON response with course details
+
+**HTTP Method:** GET
+
+**Route:** `/cursos/{id}`
+
+---
+
+### edit()
+
+Show the form for editing the specified course resource.
+
+```php
+public function edit(string $id)
+```
+
+**Purpose:** Display the form for editing an existing course.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the course to edit.
+</ParamField>
+
+**Returns:** View with course edit form populated with existing data
+
+**HTTP Method:** GET
+
+**Route:** `/cursos/{id}/edit`
+
+---
+
+### update()
+
+Update the specified course resource in storage.
+
+```php
+public function update(Request $request, string $id)
+```
+
+**Purpose:** Validate and update an existing course in the database.
+
+<ParamField path="request" type="Request" required>
+  The HTTP request object containing updated course data from the edit form.
+</ParamField>
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the course to update.
+</ParamField>
+
+**Returns:** Redirect to course list or show page, or JSON response with updated course
+
+**HTTP Method:** PUT/PATCH
+
+**Route:** `/cursos/{id}`
+
+---
+
+### destroy()
+
+Remove the specified course resource from storage.
+
+```php
+public function destroy(string $id)
+```
+
+**Purpose:** Delete a course from the database.
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the course to delete.
+</ParamField>
+
+**Returns:** Redirect to course list or JSON response confirming deletion
+
+**HTTP Method:** DELETE
+
+**Route:** `/cursos/{id}`

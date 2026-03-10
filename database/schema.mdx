@@ -1,0 +1,184 @@
+---
+title: 'Database Schema'
+description: 'Complete database schema with tables, relationships, and ER diagram for the Robotics School application'
+---
+
+## Overview
+
+The Robotics School application uses a relational database with four main tables representing users, groups, courses, and their relationships.
+
+## Entity Relationship Diagram
+
+The database follows this structure:
+
+```
+grupos (Groups)
+  |
+  |-- (One-to-Many) --> usuarios (Users)
+  |
+  |-- (Many-to-Many via course_groups) --> cursos (Courses)
+```
+
+## Core Tables
+
+### grupos (Groups)
+
+Stores student groupings by skill level (beginner, intermediate, advanced).
+
+<ResponseField name="id" type="bigint" required>
+  Primary key, auto-increment
+</ResponseField>
+
+<ResponseField name="nombre" type="string">
+  Group name (e.g., "beginner", "intermediate", "advanced")
+</ResponseField>
+
+<ResponseField name="created_at" type="timestamp">
+  Record creation timestamp
+</ResponseField>
+
+<ResponseField name="updated_at" type="timestamp">
+  Record last update timestamp
+</ResponseField>
+
+---
+
+### usuarios (Users)
+
+Stores all application users including students, teachers, and administrators.
+
+<ResponseField name="id" type="bigint" required>
+  Primary key, auto-increment
+</ResponseField>
+
+<ResponseField name="nombre" type="string">
+  User's full name
+</ResponseField>
+
+<ResponseField name="email" type="string" required>
+  User's email address (unique constraint)
+</ResponseField>
+
+<ResponseField name="password" type="string">
+  Hashed password
+</ResponseField>
+
+<ResponseField name="rol" type="enum">
+  User role: 'Student', 'Teacher', or 'Administrative'
+</ResponseField>
+
+<ResponseField name="grupos_id" type="bigint">
+  Foreign key to grupos table (nullable). Cascade delete enabled.
+</ResponseField>
+
+<ResponseField name="created_at" type="timestamp">
+  Record creation timestamp
+</ResponseField>
+
+<ResponseField name="updated_at" type="timestamp">
+  Record last update timestamp
+</ResponseField>
+
+---
+
+### cursos (Courses)
+
+Stores robotics courses with their materials and content.
+
+<ResponseField name="id" type="bigint" required>
+  Primary key, auto-increment
+</ResponseField>
+
+<ResponseField name="titulo" type="string">
+  Course title
+</ResponseField>
+
+<ResponseField name="cover" type="string">
+  URL or path to course cover image
+</ResponseField>
+
+<ResponseField name="contenido" type="text">
+  Course content/description
+</ResponseField>
+
+<ResponseField name="didactic_material" type="string">
+  Didactic materials associated with the course
+</ResponseField>
+
+<ResponseField name="robotics_kit" type="string">
+  Required robotics kit (e.g., "StarterKit", "Educational Robotics Kit", "Kit5")
+</ResponseField>
+
+<ResponseField name="created_at" type="timestamp">
+  Record creation timestamp
+</ResponseField>
+
+<ResponseField name="updated_at" type="timestamp">
+  Record last update timestamp
+</ResponseField>
+
+---
+
+### course_groups (Pivot Table)
+
+Many-to-many relationship between courses and groups.
+
+<ResponseField name="id" type="bigint" required>
+  Primary key, auto-increment
+</ResponseField>
+
+<ResponseField name="grupos_id" type="bigint" required>
+  Foreign key to grupos table. Cascade delete enabled.
+</ResponseField>
+
+<ResponseField name="cursos_id" type="bigint" required>
+  Foreign key to cursos table. Cascade delete enabled.
+</ResponseField>
+
+<ResponseField name="created_at" type="timestamp">
+  Record creation timestamp
+</ResponseField>
+
+<ResponseField name="updated_at" type="timestamp">
+  Record last update timestamp
+</ResponseField>
+
+---
+
+## System Tables
+
+Laravel includes additional system tables for caching and job queue management:
+
+- **cache** / **cache_locks**: Application cache storage
+- **jobs** / **job_batches** / **failed_jobs**: Queue and background job management
+
+## Relationships
+
+### One-to-Many
+
+- A `grupo` has many `usuarios`
+- A `usuario` belongs to one `grupo` (optional)
+
+### Many-to-Many
+
+- `grupos` and `cursos` are connected through the `course_groups` pivot table
+- A group can have many courses
+- A course can be assigned to many groups
+
+## Constraints & Indexes
+
+<ParamField path="usuarios.email" type="unique">
+  Unique constraint ensures no duplicate email addresses
+</ParamField>
+
+<ParamField path="usuarios.grupos_id" type="foreign key">
+  References grupos.id with CASCADE DELETE
+</ParamField>
+
+<ParamField path="course_groups.grupos_id" type="foreign key">
+  References grupos.id with CASCADE DELETE
+</ParamField>
+
+<ParamField path="course_groups.cursos_id" type="foreign key">
+  References cursos.id with CASCADE DELETE
+</ParamField>

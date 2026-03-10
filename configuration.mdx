@@ -1,0 +1,762 @@
+---
+title: Configuration
+description: Configure your Robotics School installation with environment variables and application settings
+---
+
+# Configuring Robotics School
+
+After installation, you'll need to configure Robotics School to match your environment and requirements. All configuration is managed through the `.env` file in your application root.
+
+## Environment File Overview
+
+The `.env` file contains all sensitive configuration data and environment-specific settings. This file is created from `.env.example` during installation and should **never be committed to version control**.
+
+<Warning>
+  The `.env` file contains sensitive information including encryption keys, database passwords, and API credentials. Always keep this file secure and never share it publicly.
+</Warning>
+
+## Core Application Settings
+
+These settings control fundamental application behavior:
+
+### Application Identity
+
+```env
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost
+```
+
+<ParamField path="APP_NAME" type="string" default="Laravel">
+  The name of your application. This appears in email notifications and other user-facing areas. Change it to "Robotics School" or your institution's name.
+
+  ```env
+  APP_NAME="Robotics School"
+  ```
+</ParamField>
+
+<ParamField path="APP_ENV" type="string" default="local">
+  The application environment. Use `local` for development, `production` for live servers.
+
+  <CodeGroup>
+  ```env Development
+  APP_ENV=local
+  ```
+
+  ```env Production
+  APP_ENV=production
+  ```
+  </CodeGroup>
+</ParamField>
+
+<ParamField path="APP_KEY" type="string" required>
+  The application encryption key. Generated automatically by `php artisan key:generate`. This key is used to encrypt session data and other sensitive information.
+
+  <Note>
+    Never manually edit this value. Always use `php artisan key:generate` to create a secure key.
+  </Note>
+</ParamField>
+
+<ParamField path="APP_DEBUG" type="boolean" default="true">
+  Enable detailed error messages. **Always set to `false` in production** to prevent exposing sensitive information.
+
+  <CodeGroup>
+  ```env Development
+  APP_DEBUG=true
+  ```
+
+  ```env Production
+  APP_DEBUG=false
+  ```
+  </CodeGroup>
+</ParamField>
+
+<ParamField path="APP_URL" type="string" default="http://localhost">
+  The base URL of your application. Used for generating links in emails and other contexts.
+
+  ```env
+  APP_URL=https://robotics-school.yourdomain.com
+  ```
+</ParamField>
+
+### Localization Settings
+
+```env
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+APP_FAKER_LOCALE=en_US
+```
+
+<ParamField path="APP_LOCALE" type="string" default="en">
+  The default language for the application. Available options depend on your translation files.
+
+  <CodeGroup>
+  ```env English
+  APP_LOCALE=en
+  ```
+
+  ```env Spanish
+  APP_LOCALE=es
+  ```
+
+  ```env French
+  APP_LOCALE=fr
+  ```
+  </CodeGroup>
+</ParamField>
+
+<ParamField path="APP_FALLBACK_LOCALE" type="string" default="en">
+  Fallback language when translations are missing in the primary locale.
+</ParamField>
+
+<ParamField path="APP_FAKER_LOCALE" type="string" default="en_US">
+  Locale for generating fake data in tests and database seeders.
+</ParamField>
+
+### Maintenance Mode
+
+```env
+APP_MAINTENANCE_DRIVER=file
+# APP_MAINTENANCE_STORE=database
+```
+
+<ParamField path="APP_MAINTENANCE_DRIVER" type="string" default="file">
+  Storage driver for maintenance mode state. Options: `file` or `database`.
+</ParamField>
+
+### Security Settings
+
+```env
+BCRYPT_ROUNDS=12
+```
+
+<ParamField path="BCRYPT_ROUNDS" type="integer" default="12">
+  Number of hashing rounds for password encryption. Higher values are more secure but slower. Range: 4-31.
+
+  <Note>
+    The default value of 12 provides good security. Only increase if you need enhanced security and can accept slower authentication.
+  </Note>
+</ParamField>
+
+## Database Configuration
+
+Robotics School supports multiple database systems. Configure based on your chosen database:
+
+### SQLite (Default)
+
+```env
+DB_CONNECTION=sqlite
+```
+
+SQLite is perfect for development and small deployments. The database file is located at `database/database.sqlite`.
+
+<Steps>
+  <Step title="Create Database File">
+    ```bash
+    touch database/database.sqlite
+    ```
+  </Step>
+
+  <Step title="Run Migrations">
+    ```bash
+    php artisan migrate
+    ```
+  </Step>
+</Steps>
+
+### MySQL
+
+For production environments, MySQL is recommended:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=robotics_school
+DB_USERNAME=root
+DB_PASSWORD=your_secure_password
+```
+
+<ParamField path="DB_CONNECTION" type="string" default="sqlite">
+  Database driver to use. Options: `sqlite`, `mysql`, `pgsql`, `sqlsrv`.
+</ParamField>
+
+<ParamField path="DB_HOST" type="string" default="127.0.0.1">
+  Database server hostname or IP address.
+</ParamField>
+
+<ParamField path="DB_PORT" type="integer" default="3306">
+  Database server port. MySQL uses 3306, PostgreSQL uses 5432.
+</ParamField>
+
+<ParamField path="DB_DATABASE" type="string">
+  Name of the database to use. Must be created before running migrations.
+</ParamField>
+
+<ParamField path="DB_USERNAME" type="string">
+  Database user with appropriate permissions.
+</ParamField>
+
+<ParamField path="DB_PASSWORD" type="string">
+  Database user password.
+
+  <Warning>
+    Use a strong, unique password for production databases.
+  </Warning>
+</ParamField>
+
+### PostgreSQL
+
+For PostgreSQL, use these settings:
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=robotics_school
+DB_USERNAME=postgres
+DB_PASSWORD=your_secure_password
+```
+
+## Session Configuration
+
+Robotics School uses database-backed sessions for persistence:
+
+```env
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
+```
+
+<ParamField path="SESSION_DRIVER" type="string" default="database">
+  Where to store session data. Options: `file`, `cookie`, `database`, `redis`, `memcached`.
+
+  <Note>
+    Database sessions are recommended for multi-server deployments.
+  </Note>
+</ParamField>
+
+<ParamField path="SESSION_LIFETIME" type="integer" default="120">
+  Session lifetime in minutes. Users will be logged out after this period of inactivity.
+
+  <CodeGroup>
+  ```env 2 Hours
+  SESSION_LIFETIME=120
+  ```
+
+  ```env 8 Hours
+  SESSION_LIFETIME=480
+  ```
+
+  ```env 24 Hours
+  SESSION_LIFETIME=1440
+  ```
+  </CodeGroup>
+</ParamField>
+
+<ParamField path="SESSION_ENCRYPT" type="boolean" default="false">
+  Whether to encrypt session data. Enable for sensitive applications.
+</ParamField>
+
+<ParamField path="SESSION_PATH" type="string" default="/">
+  Cookie path for session. Usually `/` for the entire domain.
+</ParamField>
+
+<ParamField path="SESSION_DOMAIN" type="string" default="null">
+  Domain for session cookies. Set to share sessions across subdomains:
+
+  ```env
+  SESSION_DOMAIN=.yourdomain.com
+  ```
+</ParamField>
+
+## Cache Configuration
+
+```env
+CACHE_STORE=database
+# CACHE_PREFIX=
+```
+
+<ParamField path="CACHE_STORE" type="string" default="database">
+  Cache storage driver. Options: `file`, `database`, `redis`, `memcached`, `array`.
+
+  <CodeGroup>
+  ```env Database
+  CACHE_STORE=database
+  ```
+
+  ```env Redis (Faster)
+  CACHE_STORE=redis
+  ```
+
+  ```env File (Simple)
+  CACHE_STORE=file
+  ```
+  </CodeGroup>
+</ParamField>
+
+<ParamField path="CACHE_PREFIX" type="string" optional>
+  Prefix for cache keys. Useful when sharing cache storage between multiple applications.
+
+  ```env
+  CACHE_PREFIX=robotics_school_
+  ```
+</ParamField>
+
+## Queue Configuration
+
+Robotics School uses queues for background job processing:
+
+```env
+QUEUE_CONNECTION=database
+```
+
+<ParamField path="QUEUE_CONNECTION" type="string" default="database">
+  Queue driver for background jobs. Options: `sync`, `database`, `redis`, `sqs`.
+
+  - `sync`: Process jobs immediately (development)
+  - `database`: Use database for queue (default)
+  - `redis`: High-performance queue (recommended for production)
+  - `sqs`: Amazon SQS (cloud deployments)
+</ParamField>
+
+### Starting the Queue Worker
+
+For production, ensure the queue worker is always running:
+
+```bash
+php artisan queue:work --tries=3 --timeout=60
+```
+
+<Note>
+  Use a process manager like Supervisor to keep the queue worker running automatically.
+</Note>
+
+## Filesystem Configuration
+
+```env
+FILESYSTEM_DISK=local
+```
+
+<ParamField path="FILESYSTEM_DISK" type="string" default="local">
+  Default filesystem disk for file uploads. Options: `local`, `public`, `s3`.
+
+  <CodeGroup>
+  ```env Local Storage
+  FILESYSTEM_DISK=local
+  ```
+
+  ```env Public Access
+  FILESYSTEM_DISK=public
+  ```
+
+  ```env Amazon S3
+  FILESYSTEM_DISK=s3
+  ```
+  </CodeGroup>
+</ParamField>
+
+### AWS S3 Configuration
+
+For cloud file storage:
+
+```env
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+```
+
+<ParamField path="AWS_ACCESS_KEY_ID" type="string">
+  AWS IAM access key for S3 access.
+</ParamField>
+
+<ParamField path="AWS_SECRET_ACCESS_KEY" type="string">
+  AWS IAM secret key.
+</ParamField>
+
+<ParamField path="AWS_DEFAULT_REGION" type="string" default="us-east-1">
+  AWS region for your S3 bucket.
+</ParamField>
+
+<ParamField path="AWS_BUCKET" type="string">
+  S3 bucket name for file storage.
+</ParamField>
+
+## Logging Configuration
+
+```env
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+```
+
+<ParamField path="LOG_CHANNEL" type="string" default="stack">
+  Primary logging channel. Options: `stack`, `single`, `daily`, `syslog`, `errorlog`.
+</ParamField>
+
+<ParamField path="LOG_STACK" type="string" default="single">
+  Channels to include in the stack. Common values: `single`, `daily`.
+</ParamField>
+
+<ParamField path="LOG_LEVEL" type="string" default="debug">
+  Minimum log level to record. Options: `debug`, `info`, `notice`, `warning`, `error`, `critical`, `alert`, `emergency`.
+
+  <CodeGroup>
+  ```env Development
+  LOG_LEVEL=debug
+  ```
+
+  ```env Production
+  LOG_LEVEL=error
+  ```
+  </CodeGroup>
+</ParamField>
+
+## Mail Configuration
+
+```env
+MAIL_MAILER=log
+MAIL_SCHEME=null
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+<ParamField path="MAIL_MAILER" type="string" default="log">
+  Mail driver to use. Options: `smtp`, `sendmail`, `mailgun`, `ses`, `log`.
+
+  <CodeGroup>
+  ```env Development (Log Only)
+  MAIL_MAILER=log
+  ```
+
+  ```env SMTP Server
+  MAIL_MAILER=smtp
+  MAIL_HOST=smtp.gmail.com
+  MAIL_PORT=587
+  MAIL_USERNAME=your_email@gmail.com
+  MAIL_PASSWORD=your_app_password
+  MAIL_ENCRYPTION=tls
+  ```
+
+  ```env Mailgun
+  MAIL_MAILER=mailgun
+  MAILGUN_DOMAIN=your-domain.com
+  MAILGUN_SECRET=your-mailgun-api-key
+  ```
+  </CodeGroup>
+</ParamField>
+
+<ParamField path="MAIL_FROM_ADDRESS" type="string" required>
+  Default sender email address for outgoing emails.
+
+  ```env
+  MAIL_FROM_ADDRESS="noreply@robotics-school.com"
+  ```
+</ParamField>
+
+<ParamField path="MAIL_FROM_NAME" type="string" default="${APP_NAME}">
+  Default sender name. Uses `APP_NAME` by default.
+
+  ```env
+  MAIL_FROM_NAME="Robotics School Platform"
+  ```
+</ParamField>
+
+## Broadcasting Configuration
+
+```env
+BROADCAST_CONNECTION=log
+```
+
+<ParamField path="BROADCAST_CONNECTION" type="string" default="log">
+  Real-time event broadcasting driver. Options: `pusher`, `redis`, `log`, `null`.
+
+  For real-time features, configure Pusher or Redis:
+
+  ```env
+  BROADCAST_CONNECTION=pusher
+  PUSHER_APP_ID=your_app_id
+  PUSHER_APP_KEY=your_app_key
+  PUSHER_APP_SECRET=your_app_secret
+  PUSHER_APP_CLUSTER=mt1
+  ```
+</ParamField>
+
+## Redis Configuration
+
+For Redis-based caching, queues, or sessions:
+
+```env
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+<ParamField path="REDIS_CLIENT" type="string" default="phpredis">
+  Redis client library. Options: `phpredis`, `predis`.
+
+  <Note>
+    `phpredis` is a PHP extension and provides better performance. Install it via `pecl install redis`.
+  </Note>
+</ParamField>
+
+<ParamField path="REDIS_HOST" type="string" default="127.0.0.1">
+  Redis server hostname or IP address.
+</ParamField>
+
+<ParamField path="REDIS_PORT" type="integer" default="6379">
+  Redis server port.
+</ParamField>
+
+<ParamField path="REDIS_PASSWORD" type="string" default="null">
+  Redis password if authentication is enabled.
+</ParamField>
+
+## Memcached Configuration
+
+```env
+MEMCACHED_HOST=127.0.0.1
+```
+
+<ParamField path="MEMCACHED_HOST" type="string" default="127.0.0.1">
+  Memcached server hostname for caching.
+</ParamField>
+
+## Vite Configuration
+
+```env
+VITE_APP_NAME="${APP_NAME}"
+```
+
+Vite environment variables are accessible in frontend JavaScript:
+
+```javascript
+// Access in your JavaScript files
+const appName = import.meta.env.VITE_APP_NAME;
+```
+
+Add custom Vite variables with the `VITE_` prefix:
+
+```env
+VITE_API_URL="https://api.robotics-school.com"
+VITE_ENABLE_ANALYTICS=true
+```
+
+## Production Configuration Checklist
+
+Before deploying to production, verify these settings:
+
+<Steps>
+  <Step title="Security Settings">
+    ```env
+    APP_ENV=production
+    APP_DEBUG=false
+    APP_URL=https://your-actual-domain.com
+    ```
+
+    <Warning>
+      Never run production with `APP_DEBUG=true` - it exposes sensitive information.
+    </Warning>
+  </Step>
+
+  <Step title="Database Configuration">
+    Use a production database (MySQL/PostgreSQL):
+
+    ```env
+    DB_CONNECTION=mysql
+    DB_HOST=your-db-host
+    DB_DATABASE=robotics_school_production
+    DB_USERNAME=production_user
+    DB_PASSWORD=strong_secure_password
+    ```
+  </Step>
+
+  <Step title="Cache & Session">
+    Use Redis for better performance:
+
+    ```env
+    CACHE_STORE=redis
+    SESSION_DRIVER=redis
+    QUEUE_CONNECTION=redis
+    ```
+  </Step>
+
+  <Step title="Email Configuration">
+    Configure real email sending:
+
+    ```env
+    MAIL_MAILER=smtp
+    MAIL_HOST=your-smtp-server
+    MAIL_FROM_ADDRESS=noreply@yourdomain.com
+    ```
+  </Step>
+
+  <Step title="Logging">
+    Set appropriate log level:
+
+    ```env
+    LOG_LEVEL=warning
+    LOG_CHANNEL=daily
+    ```
+  </Step>
+
+  <Step title="HTTPS">
+    Ensure your application URL uses HTTPS:
+
+    ```env
+    APP_URL=https://robotics-school.com
+    ```
+  </Step>
+</Steps>
+
+## Environment-Specific Configuration
+
+<Tabs>
+  <Tab title="Development">
+    Optimal settings for local development:
+
+    ```env
+    APP_NAME="Robotics School"
+    APP_ENV=local
+    APP_DEBUG=true
+    APP_URL=http://localhost:8000
+
+    DB_CONNECTION=sqlite
+
+    CACHE_STORE=file
+    SESSION_DRIVER=file
+    QUEUE_CONNECTION=sync
+
+    MAIL_MAILER=log
+
+    LOG_CHANNEL=single
+    LOG_LEVEL=debug
+    ```
+  </Tab>
+
+  <Tab title="Staging">
+    Settings for testing environment:
+
+    ```env
+    APP_NAME="Robotics School (Staging)"
+    APP_ENV=staging
+    APP_DEBUG=false
+    APP_URL=https://staging.robotics-school.com
+
+    DB_CONNECTION=mysql
+    DB_HOST=staging-db-host
+    DB_DATABASE=robotics_school_staging
+
+    CACHE_STORE=database
+    SESSION_DRIVER=database
+    QUEUE_CONNECTION=database
+
+    MAIL_MAILER=smtp
+
+    LOG_CHANNEL=daily
+    LOG_LEVEL=info
+    ```
+  </Tab>
+
+  <Tab title="Production">
+    Production-ready configuration:
+
+    ```env
+    APP_NAME="Robotics School"
+    APP_ENV=production
+    APP_DEBUG=false
+    APP_URL=https://robotics-school.com
+
+    DB_CONNECTION=mysql
+    DB_HOST=production-db-host
+    DB_DATABASE=robotics_school
+
+    CACHE_STORE=redis
+    SESSION_DRIVER=redis
+    QUEUE_CONNECTION=redis
+
+    REDIS_HOST=redis-host
+    REDIS_PASSWORD=secure_redis_password
+
+    MAIL_MAILER=smtp
+    MAIL_HOST=smtp.sendgrid.net
+
+    LOG_CHANNEL=daily
+    LOG_LEVEL=warning
+
+    FILESYSTEM_DISK=s3
+    AWS_ACCESS_KEY_ID=your_key
+    AWS_SECRET_ACCESS_KEY=your_secret
+    AWS_BUCKET=robotics-school-files
+    ```
+  </Tab>
+</Tabs>
+
+## Testing Configuration
+
+For running tests, Robotics School uses separate configuration. You can create a `.env.testing` file:
+
+```env
+APP_ENV=testing
+DB_CONNECTION=sqlite
+DB_DATABASE=:memory:
+CACHE_STORE=array
+SESSION_DRIVER=array
+QUEUE_CONNECTION=sync
+MAIL_MAILER=array
+```
+
+Run tests with:
+
+```bash
+php artisan test
+# or
+composer run test
+```
+
+## Configuration Caching
+
+For production performance, cache your configuration:
+
+```bash
+php artisan config:cache
+```
+
+This combines all configuration files into a single cached file. Remember to clear the cache after updating `.env`:
+
+```bash
+php artisan config:clear
+```
+
+<Warning>
+  When configuration is cached, changes to `.env` won't take effect until you run `config:cache` again.
+</Warning>
+
+## Additional Resources
+
+<CardGroup cols={2}>
+  <Card title="Laravel Configuration" icon="book" href="https://laravel.com/docs/11.x/configuration">
+    Official Laravel configuration documentation
+  </Card>
+  <Card title="Environment Variables" icon="key" href="https://laravel.com/docs/11.x/configuration#environment-configuration">
+    Learn more about Laravel environment configuration
+  </Card>
+</CardGroup>
+
+---
+
+<Note>
+  Always backup your `.env` file before making significant changes. Keep production `.env` files secure and never commit them to version control.
+</Note>

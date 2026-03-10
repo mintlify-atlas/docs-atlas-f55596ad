@@ -1,0 +1,165 @@
+---
+title: 'Course Management'
+description: 'Create and manage robotics courses with multimedia content, didactic materials, and robotics kits'
+icon: 'book-open'
+---
+
+## Overview
+
+The Course Management system allows teachers and administrators to create comprehensive robotics courses with rich multimedia content, educational materials, and assigned robotics kits for hands-on learning.
+
+## Course Components
+
+<CardGroup cols={2}>
+  <Card title="Course Content" icon="file-lines">
+    Rich text content including lessons, instructions, and learning objectives for each course.
+  </Card>
+  
+  <Card title="Cover Image" icon="image">
+    Visual representation of the course displayed in course listings and details pages.
+  </Card>
+  
+  <Card title="Didactic Materials" icon="folder-open">
+    Supplementary educational resources, worksheets, and reference materials for students.
+  </Card>
+  
+  <Card title="Robotics Kit" icon="robot">
+    Specification of the physical robotics kit required for hands-on activities in the course.
+  </Card>
+</CardGroup>
+
+## Course Fields
+
+Each course in the system contains the following information:
+
+### Title (titulo)
+The name of the course that appears throughout the platform. This should be clear, descriptive, and indicate the robotics concept or skill being taught.
+
+**Example**: "Introduction to Arduino Programming", "Building Your First Robot", "Advanced Sensor Integration"
+
+### Cover Image (cover)
+A visual banner or thumbnail image that represents the course. This helps students quickly identify courses and makes the learning interface more engaging.
+
+<Note>
+  Cover images should be optimized for web display. Recommended dimensions and formats will depend on your platform's design system.
+</Note>
+
+### Course Content (contenido)
+The main educational content of the course. This field supports extensive text content and can include:
+
+- Learning objectives and outcomes
+- Step-by-step instructions
+- Theoretical concepts and explanations
+- Safety guidelines for robotics activities
+- Project milestones and checkpoints
+
+### Didactic Materials (didactic_material)
+Links or references to supplementary teaching materials such as:
+
+- PDF worksheets and handouts
+- Video tutorials
+- External learning resources
+- Assessment templates
+- Project rubrics
+
+### Robotics Kit (robotics_kit)
+Specification of the physical robotics kit required for the course. This helps students and teachers ensure they have the correct hardware for hands-on activities.
+
+**Example kits**: "Arduino Starter Kit", "LEGO Mindstorms EV3", "Raspberry Pi Robotics Kit", "VEX IQ Super Kit"
+
+## Database Schema
+
+Courses are stored in the `cursos` table with the following structure:
+
+```sql
+Schema::create('cursos', function (Blueprint $table) {
+    $table->id();
+    $table->string('titulo');
+    $table->string('cover');
+    $table->text('contenido');
+    $table->string('didactic_material');
+    $table->string('robotics_kit');
+    $table->timestamps();
+});
+```
+
+## Creating a Course
+
+<Note>
+  Course creation is available to users with Teacher or Administrative roles.
+</Note>
+
+To create a new robotics course:
+
+1. **Choose a Title**: Select a clear, descriptive name for your course
+2. **Upload a Cover**: Add an engaging image that represents the course content
+3. **Write Content**: Develop comprehensive learning materials and instructions
+4. **Add Materials**: Link to supplementary didactic resources
+5. **Specify Kit**: Identify the robotics kit students will need
+6. **Assign to Groups**: Connect the course to student groups (see Group System)
+
+## Course Assignment
+
+Courses are assigned to students through the group system. When a course is associated with a group:
+
+- All students in that group gain access to the course
+- The course appears in their learning dashboard
+- Students can access all course materials and content
+- Progress tracking is enabled for the course
+
+<Card title="Learn More" icon="users" href="/features/group-system">
+  Understand how courses are distributed to students through the Group System
+</Card>
+
+## Managing Course Content
+
+### Updating Courses
+
+Teachers and administrators can update course content at any time. Changes are immediately reflected for all students with access to the course.
+
+<Accordion title="Best Practices for Course Updates">
+  - **Notify Students**: Inform students when significant changes are made
+  - **Version Control**: Keep track of major content revisions
+  - **Test Links**: Verify that all external resources and materials remain accessible
+  - **Kit Compatibility**: Ensure robotics kit specifications remain accurate
+</Accordion>
+
+### Content Organization
+
+For optimal learning experiences, organize course content with:
+
+- Clear learning progression from basic to advanced concepts
+- Modular sections that can be completed independently
+- Practical hands-on activities integrated with theory
+- Assessment checkpoints to measure understanding
+
+## Multimedia Support
+
+The `contenido` field uses a text data type, providing flexibility for:
+
+- Long-form written content
+- Embedded markdown formatting (if supported by your frontend)
+- Structured lesson plans
+- Multi-section course materials
+
+<Note>
+  The content field can store extensive text. For very large courses, consider breaking content into multiple related courses or modules.
+</Note>
+
+## Robotics Kit Integration
+
+The robotics kit field ensures students and teachers have the right equipment:
+
+- **Pre-course Preparation**: Students know what hardware to obtain
+- **Lab Management**: Schools can inventory and allocate kits appropriately
+- **Compatibility**: Ensures course instructions match the physical hardware
+- **Kit-specific Content**: Allows courses tailored to specific robotics platforms
+
+## Course Lifecycle
+
+Courses in the system support timestamps for tracking:
+
+- **Creation Date**: When the course was first added to the platform
+- **Last Updated**: When content was most recently modified
+
+These timestamps help teachers maintain up-to-date content and track the age of course materials.

@@ -1,0 +1,116 @@
+---
+title: 'User Management'
+description: 'Manage users with three distinct roles: Student, Teacher, and Administrative'
+icon: 'users'
+---
+
+## Overview
+
+The Robotics School platform supports a comprehensive user management system with three distinct roles, each designed to provide appropriate access and functionality for different types of users.
+
+## User Roles
+
+<CardGroup cols={3}>
+  <Card title="Student" icon="graduation-cap">
+    Students can access assigned courses, view educational materials, and participate in robotics learning activities.
+  </Card>
+  
+  <Card title="Teacher" icon="chalkboard-user">
+    Teachers can create and manage courses, upload didactic materials, assign robotics kits, and oversee student groups.
+  </Card>
+  
+  <Card title="Administrative" icon="user-shield">
+    Administrators have full system access to manage users, groups, courses, and platform configuration.
+  </Card>
+</CardGroup>
+
+## User Profile Fields
+
+Each user account contains the following information:
+
+- **Name** - Full name of the user
+- **Email** - Unique email address for login and notifications
+- **Password** - Securely hashed authentication credential
+- **Role** - One of three roles: Student, Teacher, or Administrative
+- **Group Assignment** - Optional assignment to a learning group
+
+<Note>
+  Users can only be assigned to one group at a time. Group assignments are optional and can be modified by administrators or teachers.
+</Note>
+
+## Database Schema
+
+The user system is built on the `usuarios` table with the following structure:
+
+```sql
+Schema::create('usuarios', function (Blueprint $table) {
+    $table->id();
+    $table->string('nombre');
+    $table->string('password');
+    $table->string('email')->unique();
+    $table->enum('rol', ['Student', 'Teacher', 'Administrative']);
+    $table->foreignId('grupos_id')->nullable()->constrained('grupos')->cascadeOnDelete();
+    $table->timestamps();
+});
+```
+
+## Role-Based Capabilities
+
+<Accordion title="Student Capabilities">
+  - Access assigned courses and learning materials
+  - View robotics kit information for their courses
+  - Participate in group-based learning activities
+  - Track personal learning progress
+</Accordion>
+
+<Accordion title="Teacher Capabilities">
+  - All student capabilities
+  - Create and edit course content
+  - Upload didactic materials and course covers
+  - Assign robotics kits to courses
+  - Manage student groups
+  - Monitor student progress
+</Accordion>
+
+<Accordion title="Administrative Capabilities">
+  - All teacher and student capabilities
+  - Create and manage user accounts
+  - Assign roles to users
+  - Configure system-wide settings
+  - Manage all groups and courses across the platform
+  - Access system analytics and reports
+</Accordion>
+
+## Group Assignment
+
+Users can be assigned to groups to organize learning cohorts. When a user is assigned to a group:
+
+- They gain access to all courses assigned to that group
+- Group deletion automatically removes user associations (cascade delete)
+- Groups can represent skill levels (beginner, intermediate, advanced) or class cohorts
+
+<Note>
+  The `grupos_id` field is nullable, allowing users to exist without group assignment. This is useful for administrative accounts or users in transition between groups.
+</Note>
+
+## Getting Started
+
+### Default Accounts
+
+The system comes pre-configured with three default user accounts for testing and initial setup. See the [Role-Based Access](/features/role-based-access) documentation for details on default credentials.
+
+### Adding New Users
+
+Administrators and teachers can create new user accounts by:
+
+1. Navigating to the user management interface
+2. Providing required information (name, email, password)
+3. Selecting the appropriate role
+4. Optionally assigning the user to a group
+
+### Security Features
+
+- **Unique Email Addresses**: Each user must have a unique email address
+- **Password Hashing**: All passwords are securely hashed before storage
+- **Role Validation**: Roles are enforced at the database level using enum constraints
+- **Cascading Deletes**: User associations are automatically cleaned up when groups are deleted

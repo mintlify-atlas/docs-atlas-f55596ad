@@ -1,0 +1,288 @@
+---
+title: 'Database Migrations'
+description: 'Complete list of database migrations and how to run them'
+---
+
+## Overview
+
+Migrations are version control for your database, allowing you to define and share the application's database schema. All migration files are located in `database/migrations/`.
+
+## Running Migrations
+
+### Run All Pending Migrations
+
+```bash
+php artisan migrate
+```
+
+### Rollback the Last Migration
+
+```bash
+php artisan migrate:rollback
+```
+
+### Rollback All Migrations
+
+```bash
+php artisan migrate:reset
+```
+
+### Rollback and Re-run All Migrations
+
+```bash
+php artisan migrate:refresh
+```
+
+### Drop All Tables and Re-run Migrations
+
+```bash
+php artisan migrate:fresh
+```
+
+---
+
+## Migration Files
+
+Migrations run in alphabetical/numerical order based on their filename prefixes.
+
+### 1. Create Cache Table
+
+**File:** `0001_01_01_000001_create_cache_table.php`
+
+Creates Laravel's cache storage tables.
+
+```php
+public function up(): void
+{
+    Schema::create('cache', function (Blueprint $table) {
+        $table->string('key')->primary();
+        $table->mediumText('value');
+        $table->integer('expiration')->index();
+    });
+
+    Schema::create('cache_locks', function (Blueprint $table) {
+        $table->string('key')->primary();
+        $table->string('owner');
+        $table->integer('expiration')->index();
+    });
+}
+```
+
+**Tables Created:**
+- `cache` - Stores cached data
+- `cache_locks` - Manages cache locks for atomic operations
+
+---
+
+### 2. Create Jobs Table
+
+**File:** `0001_01_01_000002_create_jobs_table.php`
+
+Creates Laravel's queue and job management tables.
+
+```php
+public function up(): void
+{
+    Schema::create('jobs', function (Blueprint $table) {
+        $table->id();
+        $table->string('queue')->index();
+        $table->longText('payload');
+        $table->unsignedTinyInteger('attempts');
+        $table->unsignedInteger('reserved_at')->nullable();
+        $table->unsignedInteger('available_at');
+        $table->unsignedInteger('created_at');
+    });
+
+    Schema::create('job_batches', function (Blueprint $table) {
+        $table->string('id')->primary();
+        $table->string('name');
+        $table->integer('total_jobs');
+        $table->integer('pending_jobs');
+        $table->integer('failed_jobs');
+        $table->longText('failed_job_ids');
+        $table->mediumText('options')->nullable();
+        $table->integer('cancelled_at')->nullable();
+        $table->integer('created_at');
+        $table->integer('finished_at')->nullable();
+    });
+
+    Schema::create('failed_jobs', function (Blueprint $table) {
+        $table->id();
+        $table->string('uuid')->unique();
+        $table->text('connection');
+        $table->text('queue');
+        $table->longText('payload');
+        $table->longText('exception');
+        $table->timestamp('failed_at')->useCurrent();
+    });
+}
+```
+
+**Tables Created:**
+- `jobs` - Queued jobs waiting to be processed
+- `job_batches` - Batch job tracking
+- `failed_jobs` - Failed job records for debugging
+
+---
+
+### 3. Create Grupos Table
+
+**File:** `001_create_grupos_table.php`
+
+Creates the grupos (groups) table for organizing students by skill level.
+
+```php
+public function up(): void
+{
+    Schema::create('grupos', function (Blueprint $table) {
+        $table->id();
+        $table->string('nombre'); // beginner, intermediate, advanced
+        $table->timestamps();
+    });
+}
+
+public function down(): void
+{
+    Schema::dropIfExists('grupos');
+}
+```
+
+**Columns:**
+- `id` - Primary key
+- `nombre` - Group name (e.g., "beginner", "intermediate", "advanced")
+- `created_at`, `updated_at` - Timestamps
+
+---
+
+### 4. Create Usuarios Table
+
+**File:** `002_create_usuarios_table.php`
+
+Creates the usuarios (users) table with role-based access.
+
+```php
+public function up(): void
+{
+    Schema::create('usuarios', function (Blueprint $table) {
+        $table->id();
+        $table->string('nombre');
+        $table->string('password');
+        $table->string('email')->unique();
+        $table->enum('rol', ['Student', 'Teacher', 'Administrative']);
+        $table->foreignId('grupos_id')->nullable()->constrained('grupos')->cascadeOnDelete();
+        $table->timestamps();
+    });
+}
+
+public function down(): void
+{
+    Schema::dropIfExists('usuarios');
+}
+```
+
+**Columns:**
+- `id` - Primary key
+- `nombre` - User's full name
+- `email` - Unique email address
+- `password` - Hashed password
+- `rol` - Enum: 'Student', 'Teacher', or 'Administrative'
+- `grupos_id` - Foreign key to grupos table (nullable, cascade delete)
+- `created_at`, `updated_at` - Timestamps
+
+---
+
+### 5. Create Cursos Table
+
+**File:** `002_create_cursos_table.php`
+
+Creates the cursos (courses) table for robotics courses.
+
+```php
+public function up(): void
+{
+    Schema::create('cursos', function (Blueprint $table) {
+        $table->id();
+        $table->string('titulo');
+        $table->string('cover');
+        $table->text('contenido');
+        $table->string('didactic_material');
+        $table->string('robotics_kit');
+        $table->timestamps();
+    });
+}
+
+public function down(): void
+{
+    Schema::dropIfExists('cursos');
+}
+```
+
+**Columns:**
+- `id` - Primary key
+- `titulo` - Course title
+- `cover` - Course cover image URL/path
+- `contenido` - Course content (text)
+- `didactic_material` - Associated materials
+- `robotics_kit` - Required robotics kit
+- `created_at`, `updated_at` - Timestamps
+
+---
+
+### 6. Create Course Groups Table
+
+**File:** `003_create_course_groups_table.php`
+
+Creates the pivot table for the many-to-many relationship between courses and groups.
+
+```php
+public function up(): void
+{
+    Schema::create('course_groups', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('grupos_id')->constrained()->onDelete('cascade');
+        $table->foreignId('cursos_id')->constrained()->onDelete('cascade');
+        $table->timestamps();
+    });
+}
+
+public function down(): void
+{
+    Schema::dropIfExists('course_groups');
+}
+```
+
+**Columns:**
+- `id` - Primary key
+- `grupos_id` - Foreign key to grupos table (cascade delete)
+- `cursos_id` - Foreign key to cursos table (cascade delete)
+- `created_at`, `updated_at` - Timestamps
+
+---
+
+## Migration Order
+
+The migrations must run in this order to respect foreign key constraints:
+
+1. System tables (cache, jobs)
+2. `grupos` - No dependencies
+3. `usuarios` - Depends on grupos
+4. `cursos` - No dependencies
+5. `course_groups` - Depends on both grupos and cursos
+
+## Best Practices
+
+<Note>
+  Always backup your database before running migrations in production.
+</Note>
+
+<Warning>
+  The `migrate:fresh` command will drop all tables. Use with caution!
+</Warning>
+
+<Tip>
+  Use `migrate:status` to check which migrations have been run:
+  
+  ```bash
+  php artisan migrate:status
+  ```
+</Tip>

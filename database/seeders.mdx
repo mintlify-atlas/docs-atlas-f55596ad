@@ -1,0 +1,262 @@
+---
+title: 'Database Seeders'
+description: 'Documentation for database seeders including default user credentials'
+---
+
+## Overview
+
+Seeders populate the database with initial or test data. All seeder files are located in `database/seeders/`.
+
+## Running Seeders
+
+### Run All Seeders
+
+```bash
+php artisan db:seed
+```
+
+### Run a Specific Seeder
+
+```bash
+php artisan db:seed --class=UsuariosSeeder
+```
+
+### Refresh Database and Seed
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+## UsuariosSeeder
+
+**Location:** `database/seeders/UsuariosSeeder.php`
+
+Creates three default users with different roles for testing and initial setup.
+
+### Source Code
+
+```php
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+class UsuariosSeeder extends Seeder
+{
+    public function run()
+    {
+        DB::table('usuarios')->insert([
+            [
+                'nombre' => 'Admon',
+                'email' => 'admon@robotics.com',
+                'password' => Hash::make('Adm@2022'),
+                'rol' => 'Administrative',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nombre' => 'Tecmilenio',
+                'email' => 'tecmilenio@robotics.com',
+                'password' => Hash::make('Adm@2022'),
+                'rol' => 'Teacher',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nombre' => 'Student',
+                'email' => 'student@robotics.com',
+                'password' => Hash::make('Adm@2022'),
+                'rol' => 'Student',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        ]);
+    }
+}
+```
+
+### Default User Credentials
+
+<Warning>
+  These are default credentials for development. Change them in production!
+</Warning>
+
+#### Administrative User
+
+<ParamField path="email" type="string">
+  admon@robotics.com
+</ParamField>
+
+<ParamField path="password" type="string">
+  Adm@2022
+</ParamField>
+
+<ParamField path="rol" type="string">
+  Administrative
+</ParamField>
+
+Full administrative access to the system.
+
+---
+
+#### Teacher User
+
+<ParamField path="email" type="string">
+  tecmilenio@robotics.com
+</ParamField>
+
+<ParamField path="password" type="string">
+  Adm@2022
+</ParamField>
+
+<ParamField path="rol" type="string">
+  Teacher
+</ParamField>
+
+Teacher account for managing courses and student groups.
+
+---
+
+#### Student User
+
+<ParamField path="email" type="string">
+  student@robotics.com
+</ParamField>
+
+<ParamField path="password" type="string">
+  Adm@2022
+</ParamField>
+
+<ParamField path="rol" type="string">
+  Student
+</ParamField>
+
+Student account for accessing courses.
+
+---
+
+## Curso Factory
+
+While not a seeder, the `CursoFactory` can generate fake course data for testing.
+
+**Location:** `database/factories/CursoFactory.php`
+
+```php
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Curso;
+
+class CursoFactory extends Factory
+{
+    protected $model = Curso::class;
+
+    public function definition(): array
+    {
+        return [
+            'titulo' => $this->faker->sentence(3),
+            'cover' => $this->faker->imageUrl(640,480,'technology'),
+            'contenido' => $this->faker->paragraph(),
+            'didactic_material' => $this->faker->word,
+            'robotics_kit' => $this->faker->randomElement([
+                'StarterKit',
+                'Educational Robotics Kit',
+                'Kit5'
+            ]),
+        ];
+    }
+}
+```
+
+### Using the Factory
+
+#### Create a Single Course
+
+```php
+use App\Models\Curso;
+
+Curso::factory()->create();
+```
+
+#### Create Multiple Courses
+
+```php
+Curso::factory()->count(10)->create();
+```
+
+#### Create in a Seeder
+
+```php
+public function run()
+{
+    Curso::factory()->count(20)->create();
+}
+```
+
+### Factory Generated Data
+
+<ResponseField name="titulo" type="string">
+  Random 3-word sentence (e.g., "Ipsum Dolor Sit")
+</ResponseField>
+
+<ResponseField name="cover" type="string">
+  Faker-generated image URL (640x480, technology category)
+</ResponseField>
+
+<ResponseField name="contenido" type="text">
+  Random paragraph of text
+</ResponseField>
+
+<ResponseField name="didactic_material" type="string">
+  Random single word
+</ResponseField>
+
+<ResponseField name="robotics_kit" type="string">
+  Randomly selected from: "StarterKit", "Educational Robotics Kit", or "Kit5"
+</ResponseField>
+
+---
+
+## Creating Custom Seeders
+
+### Generate a New Seeder
+
+```bash
+php artisan make:seeder GruposSeeder
+```
+
+### Register in DatabaseSeeder
+
+Edit `database/seeders/DatabaseSeeder.php`:
+
+```php
+public function run()
+{
+    $this->call([
+        UsuariosSeeder::class,
+        GruposSeeder::class,
+        // Add more seeders here
+    ]);
+}
+```
+
+## Best Practices
+
+<Tip>
+  Use factories instead of direct DB inserts when possible for more flexible test data generation.
+</Tip>
+
+<Note>
+  Seeders are idempotent by default. Running them multiple times may create duplicate records unless you add checks.
+</Note>
+
+<Warning>
+  Always use `Hash::make()` for passwords, never store plain text passwords!
+</Warning>

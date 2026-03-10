@@ -1,0 +1,140 @@
+---
+title: Introduction
+description: Welcome to Robotics School - A Laravel-based Learning Management System for robotics education
+---
+
+# Welcome to Robotics School
+
+Robotics School is a comprehensive Learning Management System (LMS) built with Laravel 12, designed specifically for robotics education institutions. This platform empowers teachers to create and manage courses while providing students with an organized learning environment.
+
+## What is Robotics School?
+
+Robotics School was created to help small robotics schools manage their educational programs more effectively. The system provides a centralized platform where teachers can create courses, manage didactic materials, and organize students into learning groups based on their skill levels.
+
+## Key Features
+
+<Card title="User Management" icon="users">
+  Three-tier role-based system with Students, Teachers, and Administrative users. Each user has specific permissions and capabilities within the platform.
+</Card>
+
+<Card title="Course Management" icon="book">
+  Comprehensive course creation system with titles, cover images, content, didactic materials, and robotics kit specifications.
+</Card>
+
+<Card title="Group Organization" icon="layer-group">
+  Organize students into groups (beginner, intermediate, advanced) with flexible course assignments through many-to-many relationships.
+</Card>
+
+<Card title="Modern Tech Stack" icon="code">
+  Built on Laravel 12 with PHP 8.2+, featuring modern development tools including Vite, Tailwind CSS, and queue processing.
+</Card>
+
+## Core Components
+
+The platform is structured around three main entities:
+
+### Users (Usuarios)
+
+The system supports three distinct user roles:
+
+- **Students**: Access assigned courses and learning materials
+- **Teachers**: Create and manage courses, upload materials, and organize content
+- **Administrative**: Oversee platform operations and user management
+
+Each user has a unique email address and can be assigned to specific groups for organized learning paths.
+
+### Courses (Cursos)
+
+Courses are the heart of the platform, featuring:
+
+- **Title**: Clear, descriptive course names
+- **Cover Image**: Visual representation of the course
+- **Content**: Comprehensive course material and curriculum
+- **Didactic Material**: Supporting educational resources
+- **Robotics Kit**: Specification of required physical robotics kits
+
+Courses can be assigned to multiple groups, allowing flexible curriculum design.
+
+### Groups (Grupos)
+
+Groups enable skill-level organization:
+
+- **Beginner**: Foundation courses for new students
+- **Intermediate**: Progressive learning for developing skills
+- **Advanced**: Complex projects and advanced robotics concepts
+
+The many-to-many relationship between courses and groups provides maximum flexibility in curriculum planning.
+
+## Technology Stack
+
+Robotics School leverages modern web technologies:
+
+```json
+{
+  "framework": "Laravel 12.x",
+  "php_version": "8.2+",
+  "database": "SQLite (default) / MySQL / PostgreSQL",
+  "frontend": "Vite + Tailwind CSS",
+  "queue": "Database queue driver",
+  "testing": "PHPUnit 11.5+"
+}
+```
+
+<Note>
+  The system uses SQLite by default for easy setup and development, but can be configured to use MySQL, PostgreSQL, or other database systems supported by Laravel.
+</Note>
+
+## Architecture Highlights
+
+### Database Schema
+
+The platform uses a relational database structure with the following tables:
+
+- `usuarios`: User accounts with role-based access
+- `grupos`: Learning groups for organizing students
+- `cursos`: Course catalog with all educational content
+- `course_groups`: Junction table for many-to-many course-group relationships
+- `cache`, `jobs`: Laravel system tables for caching and queue management
+
+### Development Features
+
+The platform includes several development conveniences:
+
+- **Automated Setup**: One-command installation script
+- **Concurrent Development**: Run server, queue, logs, and Vite simultaneously
+- **Testing Suite**: Integrated PHPUnit testing framework
+- **Code Quality**: Laravel Pint for code style enforcement
+- **Real-time Logs**: Laravel Pail for log monitoring
+
+<Warning>
+  This is a production-ready system designed for educational institutions. Ensure proper security configuration before deploying to a public-facing server.
+</Warning>
+
+## Who Should Use This?
+
+Robotics School is ideal for:
+
+- Small to medium robotics education centers
+- After-school robotics programs
+- STEM education institutions
+- Independent robotics instructors
+- Educational organizations teaching robotics at multiple skill levels
+
+## Next Steps
+
+Ready to get started? Follow our comprehensive guides:
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up Robotics School on your server with step-by-step instructions
+  </Card>
+  <Card title="Configuration" icon="gear" href="/configuration">
+    Configure environment variables and customize your installation
+  </Card>
+</CardGroup>
+
+---
+
+<Note>
+  Robotics School is built on Laravel, an open-source framework licensed under the MIT license. The platform inherits Laravel's robust security features and extensive ecosystem.
+</Note>

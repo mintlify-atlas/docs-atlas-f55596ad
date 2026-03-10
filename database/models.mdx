@@ -1,0 +1,217 @@
+---
+title: 'Eloquent Models'
+description: 'Documentation for all Eloquent ORM models including relationships and fillable attributes'
+---
+
+## Overview
+
+The application uses Laravel's Eloquent ORM for database interactions. All models are located in `app/Models/`.
+
+## Curso Model
+
+Represents robotics courses in the system.
+
+**Location:** `app/Models/Curso.php`
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Curso extends Model
+{
+    use HasFactory;
+
+    protected $table = 'cursos';
+
+    protected $fillable = [
+        'titulo',
+        'cover',
+        'contenido',
+        'didactic_material',
+        'robotics_kit'
+    ];
+}
+```
+
+### Fillable Attributes
+
+<ParamField path="titulo" type="string">
+  Course title
+</ParamField>
+
+<ParamField path="cover" type="string">
+  URL or path to course cover image
+</ParamField>
+
+<ParamField path="contenido" type="text">
+  Course content and description
+</ParamField>
+
+<ParamField path="didactic_material" type="string">
+  Associated didactic materials
+</ParamField>
+
+<ParamField path="robotics_kit" type="string">
+  Required robotics kit for the course
+</ParamField>
+
+### Relationships
+
+The Curso model has a many-to-many relationship with grupos through the `course_groups` pivot table (defined in the grupos model).
+
+### Factory Support
+
+The Curso model uses the `HasFactory` trait and has a factory at `database/factories/CursoFactory.php`.
+
+---
+
+## usuarios Model
+
+Represents users in the system (students, teachers, administrators).
+
+**Location:** `app/Models/usuarios.php`
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class usuarios extends Model
+{
+    protected $table = 'usuarios';
+    
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+}
+```
+
+### Table Configuration
+
+<ParamField path="table" type="string" default="usuarios">
+  Explicitly set table name to 'usuarios'
+</ParamField>
+
+### Relationships
+
+<ResponseField name="group()" type="BelongsTo">
+  Each user belongs to one group (grupo). Returns a `BelongsTo` relationship.
+  
+  **Note:** The relationship references `Group::class` which should map to the grupos table.
+</ResponseField>
+
+### Available Attributes
+
+Based on the migration, usuarios has:
+- `id` - Primary key
+- `nombre` - User's name
+- `email` - Unique email address
+- `password` - Hashed password
+- `rol` - User role (Student, Teacher, Administrative)
+- `grupos_id` - Foreign key to grupos table
+- `created_at` / `updated_at` - Timestamps
+
+---
+
+## grupos Model
+
+Represents student groups organized by skill level.
+
+**Location:** `app/Models/grupos.php`
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class grupos extends Model
+{
+    public function users() {
+        return $this->hasMany(User::class);
+    }
+    
+    public function courses() {
+        return $this->belongsToMany(Course::class, 'course_groups');
+    }
+}
+```
+
+### Relationships
+
+<ResponseField name="users()" type="HasMany">
+  A group has many users. Returns a `HasMany` relationship.
+  
+  **Note:** References `User::class` which should map to the usuarios table.
+</ResponseField>
+
+<ResponseField name="courses()" type="BelongsToMany">
+  A group can have many courses through the `course_groups` pivot table. Returns a `BelongsToMany` relationship.
+  
+  **Note:** References `Course::class` which should map to the cursos table.
+</ResponseField>
+
+### Available Attributes
+
+Based on the migration, grupos has:
+- `id` - Primary key
+- `nombre` - Group name (e.g., "beginner", "intermediate", "advanced")
+- `created_at` / `updated_at` - Timestamps
+
+---
+
+## Model Conventions
+
+### Naming
+
+The application uses Spanish table names (`usuarios`, `grupos`, `cursos`) with lowercase model class names matching the table names.
+
+### Timestamps
+
+All models automatically use Laravel's timestamp management (`created_at` and `updated_at`).
+
+### Mass Assignment
+
+Only the `Curso` model explicitly defines `$fillable` attributes. Consider adding `$fillable` or `$guarded` to other models for security.
+
+## Usage Examples
+
+### Creating a Course
+
+```php
+use App\Models\Curso;
+
+$curso = Curso::create([
+    'titulo' => 'Introduction to Robotics',
+    'cover' => 'path/to/cover.jpg',
+    'contenido' => 'Learn the basics of robotics...',
+    'didactic_material' => 'Workbook and slides',
+    'robotics_kit' => 'StarterKit'
+]);
+```
+
+### Querying Users by Group
+
+```php
+use App\Models\grupos;
+
+$group = grupos::find(1);
+$users = $group->users;
+```
+
+### Assigning Courses to a Group
+
+```php
+$group = grupos::find(1);
+$course = Curso::find(1);
+
+$group->courses()->attach($course->id);
+```

@@ -1,0 +1,506 @@
+---
+title: Testing
+description: Learn how to run and write tests for the Robotics School application
+---
+
+## Overview
+
+The Robotics School application uses PHPUnit for testing, providing both unit and feature tests to ensure code quality and reliability.
+
+## Test Structure
+
+Tests are organized into two main categories:
+
+<CardGroup cols={2}>
+  <Card title="Unit Tests" icon="cube">
+    **Location:** `tests/Unit/`
+    
+    Test individual classes and methods in isolation, without dependencies on the framework or database.
+  </Card>
+  
+  <Card title="Feature Tests" icon="layer-group">
+    **Location:** `tests/Feature/`
+    
+    Test complete features and workflows, including HTTP requests, database interactions, and full application behavior.
+  </Card>
+</CardGroup>
+
+## Running Tests
+
+The application provides a convenient Composer script for running tests:
+
+<Steps>
+  <Step title="Using Composer Script">
+    Run all tests using the configured script from `composer.json`:
+
+    ```bash
+    composer test
+    ```
+
+    This command executes:
+    1. Clears configuration cache: `php artisan config:clear --ansi`
+    2. Runs the test suite: `php artisan test`
+  </Step>
+
+  <Step title="Direct PHPUnit Execution">
+    You can also run PHPUnit directly:
+
+    ```bash
+    ./vendor/bin/phpunit
+    ```
+  </Step>
+
+  <Step title="Using Artisan">
+    Laravel's Artisan command provides a more user-friendly output:
+
+    ```bash
+    php artisan test
+    ```
+  </Step>
+</Steps>
+
+## Test Configuration
+
+The testing environment is configured in `phpunit.xml`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+    </php>
+</phpunit>
+```
+
+### Key Configuration Settings
+
+- **APP_ENV:** Set to `testing` to use test-specific configuration
+- **DB_CONNECTION:** Uses SQLite with in-memory database for fast, isolated tests
+- **BCRYPT_ROUNDS:** Reduced to 4 for faster password hashing in tests
+- **CACHE_STORE:** Uses array driver to avoid cache persistence
+- **MAIL_MAILER:** Uses array driver to prevent sending actual emails
+
+## Running Specific Tests
+
+<CodeGroup>
+```bash Specific Test Suite
+# Run only unit tests
+php artisan test --testsuite=Unit
+
+# Run only feature tests
+php artisan test --testsuite=Feature
+```
+
+```bash Specific Test File
+# Run a specific test file
+php artisan test tests/Feature/ExampleTest.php
+
+# Run with PHPUnit
+./vendor/bin/phpunit tests/Feature/ExampleTest.php
+```
+
+```bash Specific Test Method
+# Run a specific test method
+php artisan test --filter test_the_application_returns_a_successful_response
+```
+
+```bash With Coverage
+# Generate code coverage report
+php artisan test --coverage
+
+# Coverage with minimum threshold
+php artisan test --coverage --min=80
+```
+</CodeGroup>
+
+## Writing Unit Tests
+
+Unit tests verify individual components in isolation:
+
+```php
+<?php
+
+namespace Tests\Unit;
+
+use PHPUnit\Framework\TestCase;
+
+class ExampleTest extends TestCase
+{
+    /**
+     * A basic test example.
+     */
+    public function test_that_true_is_true(): void
+    {
+        $this->assertTrue(true);
+    }
+}
+```
+
+### Unit Test Example: Testing a Service Class
+
+```php
+<?php
+
+namespace Tests\Unit\Services;
+
+use App\Services\CursoService;
+use App\Models\Curso;
+use PHPUnit\Framework\TestCase;
+use Mockery;
+
+class CursoServiceTest extends TestCase
+{
+    protected function tearDown(): void
+    {
+        Mockery::close();
+        parent::tearDown();
+    }
+
+    public function test_it_calculates_curso_duration_correctly(): void
+    {
+        $service = new CursoService();
+        
+        $duration = $service->calculateDuration(10, 2); // 10 weeks, 2 hours/week
+        
+        $this->assertEquals(20, $duration);
+    }
+
+    public function test_it_formats_curso_name_properly(): void
+    {
+        $service = new CursoService();
+        
+        $formatted = $service->formatName('introducción a robótica');
+        
+        $this->assertEquals('Introducción A Robótica', $formatted);
+    }
+}
+```
+
+## Writing Feature Tests
+
+Feature tests verify complete application workflows:
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+
+class ExampleTest extends TestCase
+{
+    /**
+     * A basic test example.
+     */
+    public function test_the_application_returns_a_successful_response(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertStatus(200);
+    }
+}
+```
+
+### Feature Test Example: Testing Controller Endpoints
+
+```php
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Curso;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class CursoControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_view_cursos_index(): void
+    {
+        $response = $this->get(route('cursos.index'));
+
+        $response->assertStatus(200)
+                 ->assertViewIs('cursos.index');
+    }
+
+    public function test_can_create_curso(): void
+    {
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->post(route('cursos.store'), [
+            'nombre' => 'Robótica Básica',
+            'descripcion' => 'Curso introductorio de robótica',
+            'duracion' => 12,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('cursos', [
+            'nombre' => 'Robótica Básica',
+        ]);
+    }
+
+    public function test_cannot_create_curso_with_invalid_data(): void
+    {
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->post(route('cursos.store'), [
+            'nombre' => '', // Invalid: required field
+            'descripcion' => 'Test',
+        ]);
+
+        $response->assertSessionHasErrors(['nombre']);
+    }
+
+    public function test_can_update_curso(): void
+    {
+        $curso = Curso::factory()->create();
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->put(route('cursos.update', $curso), [
+            'nombre' => 'Robótica Avanzada',
+            'descripcion' => 'Curso avanzado',
+            'duracion' => 16,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('cursos', [
+            'id' => $curso->id,
+            'nombre' => 'Robótica Avanzada',
+        ]);
+    }
+
+    public function test_can_delete_curso(): void
+    {
+        $curso = Curso::factory()->create();
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)->delete(route('cursos.destroy', $curso));
+
+        $response->assertRedirect();
+        $this->assertDatabaseMissing('cursos', [
+            'id' => $curso->id,
+        ]);
+    }
+}
+```
+
+## Common Test Assertions
+
+<CodeGroup>
+```php HTTP Assertions
+// Status codes
+$response->assertStatus(200);
+$response->assertOk();
+$response->assertCreated();
+$response->assertNoContent();
+$response->assertNotFound();
+
+// Redirects
+$response->assertRedirect('/cursos');
+$response->assertRedirectToRoute('cursos.index');
+
+// View assertions
+$response->assertViewIs('cursos.show');
+$response->assertViewHas('curso');
+```
+
+```php Database Assertions
+// Check data exists
+$this->assertDatabaseHas('cursos', [
+    'nombre' => 'Robótica Básica',
+]);
+
+// Check data doesn't exist
+$this->assertDatabaseMissing('cursos', [
+    'id' => $deletedId,
+]);
+
+// Count records
+$this->assertDatabaseCount('cursos', 5);
+```
+
+```php Validation Assertions
+// Has validation errors
+$response->assertSessionHasErrors(['nombre', 'email']);
+
+// Has specific error
+$response->assertSessionHasErrors([
+    'email' => 'El correo ya está registrado.',
+]);
+
+// No validation errors
+$response->assertSessionHasNoErrors();
+```
+
+```php JSON Assertions
+// JSON structure
+$response->assertJson([
+    'success' => true,
+    'data' => [
+        'nombre' => 'Robótica Básica',
+    ],
+]);
+
+// JSON structure shape
+$response->assertJsonStructure([
+    'data' => [
+        'id',
+        'nombre',
+        'created_at',
+    ],
+]);
+```
+</CodeGroup>
+
+## Database Testing
+
+Use the `RefreshDatabase` trait to reset the database between tests:
+
+```php
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class CursoTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_can_create_curso(): void
+    {
+        $curso = Curso::create([
+            'nombre' => 'Test Curso',
+            'descripcion' => 'Test Description',
+            'duracion' => 10,
+        ]);
+
+        $this->assertDatabaseHas('cursos', [
+            'nombre' => 'Test Curso',
+        ]);
+    }
+}
+```
+
+## Test Factories
+
+Use factories to generate test data:
+
+```php
+use App\Models\Curso;
+use App\Models\Usuario;
+
+// Create a single instance
+$curso = Curso::factory()->create();
+
+// Create multiple instances
+$cursos = Curso::factory()->count(5)->create();
+
+// Create with specific attributes
+$curso = Curso::factory()->create([
+    'nombre' => 'Robótica Avanzada',
+    'duracion' => 20,
+]);
+
+// Create relationships
+$usuario = Usuario::factory()
+    ->has(Curso::factory()->count(3))
+    ->create();
+```
+
+## Continuous Integration
+
+The test suite is designed to run in CI/CD pipelines:
+
+```yaml
+# Example GitHub Actions workflow
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          
+      - name: Install Dependencies
+        run: composer install
+        
+      - name: Run Tests
+        run: composer test
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Test Isolation" icon="shield">
+    Each test should be independent and not rely on other tests
+  </Card>
+  
+  <Card title="Descriptive Names" icon="tag">
+    Use clear test method names that describe what is being tested
+  </Card>
+  
+  <Card title="Arrange-Act-Assert" icon="list-ol">
+    Structure tests with setup, execution, and verification phases
+  </Card>
+  
+  <Card title="Test One Thing" icon="bullseye">
+    Each test should verify a single behavior or outcome
+  </Card>
+</CardGroup>
+
+## Test Coverage
+
+Monitor test coverage to ensure adequate testing:
+
+```bash
+# Generate coverage report
+php artisan test --coverage
+
+# With minimum threshold
+php artisan test --coverage --min=80
+
+# Generate HTML coverage report
+./vendor/bin/phpunit --coverage-html coverage
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Architecture" icon="sitemap" href="/development/architecture">
+    Understand the application structure
+  </Card>
+  
+  <Card title="Controllers" icon="rectangle-code" href="/development/controllers">
+    Learn about controller implementation
+  </Card>
+</CardGroup>

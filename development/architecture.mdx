@@ -1,0 +1,244 @@
+---
+title: Application Architecture
+description: Understanding the Laravel MVC structure and directory organization
+---
+
+## Overview
+
+The Robotics School application follows Laravel's MVC (Model-View-Controller) architecture pattern, providing a clean separation of concerns and organized codebase structure.
+
+## Laravel MVC Architecture
+
+<Steps>
+  <Step title="Model Layer">
+    Models represent your data structure and business logic. They interact with the database using Eloquent ORM.
+    
+    **Location:** `app/Models/`
+    
+    Models handle:
+    - Database table interactions
+    - Relationships between entities
+    - Data validation rules
+    - Business logic methods
+  </Step>
+
+  <Step title="View Layer">
+    Views contain the presentation logic and user interface components.
+    
+    **Location:** `resources/views/`
+    
+    Views handle:
+    - HTML templates
+    - Blade templating syntax
+    - Frontend component rendering
+    - Data display logic
+  </Step>
+
+  <Step title="Controller Layer">
+    Controllers handle HTTP requests and coordinate between models and views.
+    
+    **Location:** `app/Http/Controllers/`
+    
+    Controllers handle:
+    - Request processing
+    - Input validation
+    - Business logic orchestration
+    - Response formatting
+  </Step>
+</Steps>
+
+## Directory Structure
+
+The application follows Laravel's standard directory organization:
+
+```plaintext
+roboticsschool/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/      # Request handlers
+│   │   │   ├── CursoController.php
+│   │   │   └── UsuarioController.php
+│   │   ├── Middleware/       # Request/Response filters
+│   │   └── Requests/         # Form request validation
+│   ├── Models/               # Eloquent models
+│   ├── Providers/            # Service providers
+│   └── Services/             # Business logic services
+├── config/                   # Configuration files
+├── database/
+│   ├── factories/            # Model factories
+│   ├── migrations/           # Database migrations
+│   └── seeders/              # Database seeders
+├── public/                   # Public web directory
+├── resources/
+│   ├── views/                # Blade templates
+│   ├── css/                  # Stylesheets
+│   └── js/                   # JavaScript files
+├── routes/
+│   ├── web.php               # Web routes
+│   ├── api.php               # API routes
+│   └── console.php           # Console commands
+├── storage/                  # Application storage
+├── tests/
+│   ├── Feature/              # Feature tests
+│   └── Unit/                 # Unit tests
+└── vendor/                   # Composer dependencies
+```
+
+## Core Application Components
+
+### HTTP Layer
+
+The HTTP layer handles incoming requests and outgoing responses:
+
+```php
+// routes/web.php
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+```
+
+### Controller Organization
+
+Controllers are organized by resource type:
+
+- `CursoController.php` - Manages course-related operations
+- `UsuarioController.php` - Manages user-related operations
+
+Each controller follows Laravel's resource controller pattern with seven standard methods.
+
+### Configuration Management
+
+Configuration is managed through:
+
+<CodeGroup>
+```json composer.json
+{
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  }
+}
+```
+
+```bash .env
+APP_NAME=RoboticsSchool
+APP_ENV=local
+APP_KEY=base64:...
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=roboticsschool
+DB_USERNAME=root
+DB_PASSWORD=
+```
+</CodeGroup>
+
+## Autoloading and PSR-4
+
+The application uses PSR-4 autoloading standards:
+
+- `App\` namespace maps to `app/` directory
+- `App\Http\Controllers\` maps to `app/Http/Controllers/`
+- `Database\Factories\` maps to `database/factories/`
+- `Tests\` namespace maps to `tests/` directory
+
+## Request Lifecycle
+
+<Steps>
+  <Step title="Entry Point">
+    All requests enter through `public/index.php`
+  </Step>
+
+  <Step title="Kernel Handling">
+    The HTTP kernel bootstraps the application and processes the request
+  </Step>
+
+  <Step title="Service Providers">
+    Service providers register and boot application services
+  </Step>
+
+  <Step title="Routing">
+    The router matches the request to a defined route
+  </Step>
+
+  <Step title="Middleware">
+    Middleware filters the request before reaching the controller
+  </Step>
+
+  <Step title="Controller">
+    The controller processes the request and returns a response
+  </Step>
+
+  <Step title="Response">
+    The response is sent back through middleware to the client
+  </Step>
+</Steps>
+
+## Dependency Injection
+
+Laravel's service container provides automatic dependency injection:
+
+```php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class CursoController extends Controller
+{
+    public function store(Request $request)
+    {
+        // Request is automatically injected
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+        ]);
+        
+        // Process and store...
+    }
+}
+```
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Separation of Concerns" icon="layer-group">
+    Keep models, views, and controllers focused on their specific responsibilities
+  </Card>
+  
+  <Card title="Service Layer" icon="gear">
+    Extract complex business logic into service classes
+  </Card>
+  
+  <Card title="Repository Pattern" icon="database">
+    Use repositories for data access abstraction
+  </Card>
+  
+  <Card title="Follow PSR Standards" icon="code">
+    Adhere to PSR-4 autoloading and PSR-12 coding standards
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Controllers" icon="rectangle-code" href="/development/controllers">
+    Learn about resource controllers and request handling
+  </Card>
+  
+  <Card title="Testing" icon="flask" href="/development/testing">
+    Understand the testing strategy and how to run tests
+  </Card>
+</CardGroup>

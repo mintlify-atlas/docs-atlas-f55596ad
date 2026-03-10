@@ -1,0 +1,72 @@
+---
+title: 'Curso Model'
+description: 'API reference for the Curso model'
+---
+
+## Overview
+
+The `Curso` model represents courses in the Robotics School application. It handles course information including title, cover image, content, and associated materials.
+
+## Table Name
+
+```php
+protected $table = 'cursos';
+```
+
+## Fillable Attributes
+
+The following attributes can be mass-assigned:
+
+<ResponseField name="titulo" type="string">
+  The title of the course
+</ResponseField>
+
+<ResponseField name="cover" type="string">
+  The cover image path or URL for the course
+</ResponseField>
+
+<ResponseField name="contenido" type="text">
+  The main content/description of the course
+</ResponseField>
+
+<ResponseField name="didactic_material" type="string">
+  Path or reference to didactic materials for the course
+</ResponseField>
+
+<ResponseField name="robotics_kit" type="string">
+  Information about the robotics kit used in the course
+</ResponseField>
+
+## Model Definition
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Curso extends Model
+{
+    use HasFactory;
+
+    protected $table = 'cursos';
+
+    protected $fillable = [
+        'titulo',
+        'cover',
+        'contenido',
+        'didactic_material',
+        'robotics_kit'
+    ];
+}
+```
+
+## Relationships
+
+This model currently has no defined relationships.
+
+## Traits
+
+- **HasFactory**: Enables model factory support for testing and seeding

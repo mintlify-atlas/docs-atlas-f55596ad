@@ -1,0 +1,298 @@
+---
+title: 'Role-Based Access Control'
+description: 'Secure access management with three user roles and default seeded accounts'
+icon: 'shield-halved'
+---
+
+## Overview
+
+The Robotics School platform implements a robust role-based access control (RBAC) system with three distinct roles. Each role has specific permissions designed to support the educational mission while maintaining security and appropriate access levels.
+
+## Three-Tier Role System
+
+The platform uses an enum-based role system enforced at the database level, ensuring data integrity and preventing invalid role assignments.
+
+```sql
+$table->enum('rol', ['Student', 'Teacher', 'Administrative']);
+```
+
+<CardGroup cols={3}>
+  <Card title="Student" icon="graduation-cap" color="#3b82f6">
+    Learners who access courses, materials, and participate in robotics education
+  </Card>
+  
+  <Card title="Teacher" icon="chalkboard-user" color="#8b5cf6">
+    Educators who create courses, manage content, and guide student learning
+  </Card>
+  
+  <Card title="Administrative" icon="user-shield" color="#ec4899">
+    System administrators with full platform access and management capabilities
+  </Card>
+</CardGroup>
+
+## Role Permissions
+
+### Student Role
+
+**Access Level**: Read-only access to assigned content
+
+<Accordion title="Student Permissions">
+  **Can Do**:
+  - View courses assigned to their group
+  - Access course content and materials
+  - View didactic materials and robotics kit information
+  - See their group membership
+  - Update their own profile information
+  
+  **Cannot Do**:
+  - Create or edit courses
+  - Manage other users
+  - Change group assignments
+  - Access administrative functions
+  - View users outside their group
+</Accordion>
+
+### Teacher Role
+
+**Access Level**: Full content management and student oversight
+
+<Accordion title="Teacher Permissions">
+  **Can Do**:
+  - All student permissions
+  - Create new courses
+  - Edit and update course content
+  - Upload cover images and didactic materials
+  - Assign robotics kits to courses
+  - Manage student groups and assignments
+  - View student progress and engagement
+  - Assign courses to groups
+  
+  **Cannot Do**:
+  - Create or delete user accounts (depends on implementation)
+  - Access system-wide administrative settings
+  - Manage other teachers' permissions
+  - Modify platform configuration
+</Accordion>
+
+### Administrative Role
+
+**Access Level**: Full platform access and control
+
+<Accordion title="Administrative Permissions">
+  **Can Do**:
+  - All teacher and student permissions
+  - Create, edit, and delete user accounts
+  - Assign roles to users
+  - Manage all groups across the platform
+  - Configure system-wide settings
+  - Access analytics and reporting
+  - Manage course library
+  - Override any restrictions
+  - Perform system maintenance tasks
+  
+  **Cannot Do**:
+  - Nothing - administrative role has unrestricted access
+</Accordion>
+
+## Default Seeded Users
+
+The platform comes pre-configured with three default user accounts, one for each role. These accounts are automatically created during database seeding for testing and initial setup.
+
+<Warning>
+  **Security Notice**: Change the default passwords immediately after initial setup. The default credentials are publicly known and should never be used in production.
+</Warning>
+
+### Default Accounts
+
+<CardGroup cols={3}>
+  <Card title="Administrative User" icon="user-shield">
+    **Email**: `admon@robotics.com`  
+    **Password**: `Adm@2022`  
+    **Name**: Admon  
+    **Role**: Administrative
+  </Card>
+  
+  <Card title="Teacher User" icon="chalkboard-user">
+    **Email**: `tecmilenio@robotics.com`  
+    **Password**: `Adm@2022`  
+    **Name**: Tecmilenio  
+    **Role**: Teacher
+  </Card>
+  
+  <Card title="Student User" icon="graduation-cap">
+    **Email**: `student@robotics.com`  
+    **Password**: `Adm@2022`  
+    **Name**: Student  
+    **Role**: Student
+  </Card>
+</CardGroup>
+
+### Seeder Implementation
+
+The default users are created through the `UsuariosSeeder`:
+
+```php
+DB::table('usuarios')->insert([
+    [
+        'nombre' => 'Admon',
+        'email' => 'admon@robotics.com',
+        'password' => Hash::make('Adm@2022'),
+        'rol' => 'Administrative',
+        'created_at' => now(),
+        'updated_at' => now()
+    ],
+    [
+        'nombre' => 'Tecmilenio',
+        'email' => 'tecmilenio@robotics.com',
+        'password' => Hash::make('Adm@2022'),
+        'rol' => 'Teacher',
+        'created_at' => now(),
+        'updated_at' => now()
+    ],
+    [
+        'nombre' => 'Student',
+        'email' => 'student@robotics.com',
+        'password' => Hash::make('Adm@2022'),
+        'rol' => 'Student',
+        'created_at' => now(),
+        'updated_at' => now()
+    ]
+]);
+```
+
+<Note>
+  All default users share the same password (`Adm@2022`) for convenience during initial setup. Passwords are properly hashed using Laravel's `Hash::make()` function.
+</Note>
+
+## Getting Started
+
+<Steps>
+  <Step title="Initial Login">
+    Use the administrative account to log in for the first time:
+    - Email: `admon@robotics.com`
+    - Password: `Adm@2022`
+  </Step>
+  
+  <Step title="Change Default Passwords">
+    Immediately update passwords for all three default accounts to secure credentials
+  </Step>
+  
+  <Step title="Create Real Users">
+    Add actual teacher and student accounts with proper credentials
+  </Step>
+  
+  <Step title="Configure Groups">
+    Set up learning groups and assign students appropriately
+  </Step>
+  
+  <Step title="Assign Courses">
+    Create courses and assign them to groups for student access
+  </Step>
+</Steps>
+
+## Role Assignment
+
+Roles are assigned when creating new user accounts:
+
+1. Administrative users create new accounts
+2. During creation, select one of the three available roles
+3. The role is stored in the `rol` enum field
+4. Permissions are automatically enforced based on the assigned role
+
+<Note>
+  Role assignments are permanent in the database structure but can be changed by administrative users through user management interfaces.
+</Note>
+
+## Security Features
+
+### Password Security
+
+- All passwords are hashed using Laravel's secure hashing functions
+- Passwords are never stored in plain text
+- The system supports strong password requirements
+
+### Enum Validation
+
+Roles are enforced at the database level using enum constraints:
+
+```sql
+$table->enum('rol', ['Student', 'Teacher', 'Administrative']);
+```
+
+This prevents:
+- Invalid role values from being stored
+- Typos or incorrect role names
+- Unauthorized role escalation attempts
+
+### Email Uniqueness
+
+Each user must have a unique email address:
+
+```sql
+$table->string('email')->unique();
+```
+
+This ensures:
+- No duplicate accounts
+- Reliable user identification
+- Secure password reset functionality
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Change Default Passwords Immediately">
+    The default credentials are intended only for initial setup. Create strong, unique passwords for all accounts in production environments.
+  </Accordion>
+  
+  <Accordion title="Follow Principle of Least Privilege">
+    Assign the minimum role necessary for each user's responsibilities. Don't grant administrative access unnecessarily.
+  </Accordion>
+  
+  <Accordion title="Regular Permission Audits">
+    Periodically review user roles and permissions to ensure they remain appropriate as responsibilities change.
+  </Accordion>
+  
+  <Accordion title="Use Strong Passwords">
+    Enforce strong password policies with minimum length, complexity requirements, and regular password rotation.
+  </Accordion>
+  
+  <Accordion title="Monitor Administrative Actions">
+    Log and review actions taken by administrative users to maintain accountability and security.
+  </Accordion>
+</AccordionGroup>
+
+## Role-Based Workflows
+
+### Student Workflow
+
+1. Log in with student credentials
+2. View assigned group and available courses
+3. Access course content and materials
+4. Complete learning activities with assigned robotics kits
+5. Track personal progress
+
+### Teacher Workflow
+
+1. Log in with teacher credentials
+2. Create or update course content
+3. Upload didactic materials and specify robotics kits
+4. Organize students into appropriate groups
+5. Assign courses to groups
+6. Monitor student engagement and progress
+
+### Administrative Workflow
+
+1. Log in with administrative credentials
+2. Create teacher and student accounts
+3. Configure groups and organizational structure
+4. Oversee course library and content quality
+5. Manage system-wide settings
+6. Review platform analytics and usage
+
+## Integration with Other Features
+
+Role-based access control integrates with:
+
+- **[User Management](/features/user-management)**: Roles determine what actions users can perform
+- **[Course Management](/features/course-management)**: Teachers and administrators can create courses; students can only view
+- **[Group System](/features/group-system)**: Role permissions control who can manage groups and assignments
