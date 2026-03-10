@@ -65,7 +65,19 @@ class Curso extends Model
 
 ## Relationships
 
-This model currently has no defined relationships.
+While the `course_groups` pivot table exists in the database schema to enable many-to-many relationships between courses and groups, the relationship method is not yet implemented in this model.
+
+<Note>
+  To use the course-group relationship, you would need to add a `groups()` method to this model:
+  
+  ```php
+  public function groups() {
+      return $this->belongsToMany(Group::class, 'course_groups', 'cursos_id', 'grupos_id');
+  }
+  ```
+  
+  The pivot table is defined in the `course_groups` migration.
+</Note>
 
 ## Traits
 

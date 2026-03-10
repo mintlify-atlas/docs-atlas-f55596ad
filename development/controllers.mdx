@@ -206,9 +206,11 @@ Here's how to implement common controller patterns:
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'descripcion' => 'required|string',
-            'duracion' => 'required|integer|min:1',
+            'titulo' => 'required|string|max:255',
+            'cover' => 'required|string',
+            'contenido' => 'required|string',
+            'didactic_material' => 'required|string',
+            'robotics_kit' => 'required|string',
         ]);
 
         $curso = Curso::create($validated);
@@ -282,6 +284,10 @@ Here's how to implement common controller patterns:
 </Steps>
 
 ## Routing Resource Controllers
+
+<Warning>
+  The resource routes for `CursoController` and `UsuarioController` are not yet registered in `routes/web.php`. You will need to add these routes to use the controllers.
+</Warning>
 
 Register resource routes in `routes/web.php`:
 
